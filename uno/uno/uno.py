@@ -9,7 +9,7 @@ class Card:
 numbers = [int(x) for x in "0 1 2 3 4 5 6 7 8 9".split()]
 colors = "blue red yellow green".split()
 actions = "draw2 skip reverse".split()
-wildcards = "draw4 wishcolor".split()
+wilds = "draw4 wishcolor".split()
 
 def main ():
     deck = build_deck()
@@ -20,7 +20,8 @@ def build_deck() -> list[Card]:
     d.extend(list(product(actions, colors)))
     d.extend(list(product(actions, colors)))
     d = [Card(face, color) for face, color in d]
-
+    wildcards = [Card(w, "wild") for w in wilds*4]
+    d.extend(wildcards)
     return d
 
 
