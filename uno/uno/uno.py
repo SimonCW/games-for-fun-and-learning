@@ -1,9 +1,11 @@
 from itertools import product
 from dataclasses import dataclass
 from random import shuffle
+from enum import Enum
 
 N_INITAL_CARDS = 7
 
+Order = Enum("Order", ["NORMAL", "REVERSED"])
 @dataclass
 class Card:
     face: int | str
