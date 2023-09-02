@@ -15,7 +15,7 @@ names_st = lists(elements=name, min_size=2, max_size=11)
 
 
 @given(names=names_st, n_steps=integers(min_value=2, max_value=60))
-def test_player_cycle(names, n_steps):
+def test_player_cycle_steps_forward_and_back_should_return_same_name(names, n_steps):
     """Going forward n_steps from the first player and then going the same
     number of steps backwards should yield the same player."""
     player_cycle = PlayerCycle(names)
