@@ -84,7 +84,8 @@ class PlayerCycle:
             self._pos = 0 if self._direction == 1 else -1
             return self._items[self._pos]
 
-        self._pos += self._direction
+        # Modulo avoids positions that are "out of index".
+        self._pos = (self._direction + self._pos) % len(self._items)
         element = self._items[self._pos]
         return element
 
