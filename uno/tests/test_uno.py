@@ -26,3 +26,19 @@ def test_player_cycle_steps_forward_and_back_should_return_same_name(names, n_st
     for _ in range(n_steps - 1):
         next(player_cycle)
     assert next(player_cycle) == first_p
+
+
+@given(names=names_st, n_steps=integers(min_value=2, max_value=60))
+def test_two_player_cycles_should_return_same_names(names: list[str], n_steps):
+    pc1 = PlayerCycle(names)
+    pc2 = PlayerCycle(names)
+    for _ in range(n_steps):
+        name1 = next(pc1)
+        name2 = next(pc2)
+    assert name1 == name2
+    pc1.reverse()
+    pc2.reverse()
+    for _ in range(n_steps):
+        name1 = next(pc1)
+        name2 = next(pc2)
+    assert name1 == name2
