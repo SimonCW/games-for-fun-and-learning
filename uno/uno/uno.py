@@ -1,10 +1,11 @@
-from itertools import product
 from dataclasses import dataclass
+from itertools import product
 from random import shuffle
-from typing import Iterable
-
+from typing import Iterable, TypeVar
 
 N_INITAL_CARDS = 7
+
+T = TypeVar("T")
 
 
 @dataclass
@@ -72,13 +73,13 @@ def initialize_game(deck: Deck, player_names: list[str]) -> tuple[list[Player], 
 class PlayerCycle:
     """Gives the next Player. Can be reversed."""
 
-    def __init__(self, player_names: Iterable) -> None:
+    def __init__(self, player_names: Iterable[T]) -> None:
         self._items = list(player_names)
         self._pos = None
         # 1 for normal direction, -1 for reversed
         self._direction = 1
 
-    def __next__(self):
+    def __next__(self) -> T:
         # First play in the game
         if self._pos is None:
             self._pos = 0 if self._direction == 1 else -1
