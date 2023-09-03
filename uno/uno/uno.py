@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from itertools import product
 from random import shuffle
 from typing import Iterable, TypeVar
+from collections import deque
 
 N_INITAL_CARDS = 7
 
@@ -31,17 +32,17 @@ wilds = "draw4 wishcolor".split()
 
 
 def main():
+    stack = deque()
     deck = build_deck()
     player_names = ["Jane", "Walther", "Jojo"]
     players, deck = initialize_game(deck, player_names)
-
-    pc = PlayerCycle(players)
-    for _ in range(3):
-        print(next(pc).name)
-    print("reverse")
-    pc.reverse()
-    for _ in range(3):
-        print(next(pc).name)
+    # Put first open card on the stack
+    stack.appendleft(deck.pop())
+    print(f"Top of stack: {stack[0]}")
+    # do_card_action()
+    player_cycle = PlayerCycle(players)
+    up = next(player_cycle)
+    print(f"Next Player: {up}")
 
     # Game Loop
     while True:
@@ -74,7 +75,7 @@ class PlayerCycle:
     """Gives the next Player. Can be reversed."""
 
     def __init__(self, player_names: Iterable[T]) -> None:
-        self._items = list(player_names)
+        self._items: list[T] = list(player_names)
         self._pos = None
         # 1 for normal direction, -1 for reversed
         self._direction = 1
@@ -95,6 +96,21 @@ class PlayerCycle:
 
     def reverse(self):
         self._direction *= -1
+
+def do_card_action(Card, player_cycle: PlayerCycle, deck: Deck) -> None | tuple[Card, Card] | tuple[Card, Card, Card, Card]:
+    # Argh, I don't like this. I'd need to hand this function all kinds of objects such
+    # as player_cycle to mutate their state. That's kinda ugly. But an almighty
+    # "Game" Object isn't better. At least, with this function it is explicit.
+
+    match Card.face:
+        case "reverse":
+            print("Reversing play direction")
+            player_cycle.reverse()
+            return
+        case "draw2":
+            print("Düdum, you have to draw 2")
+            return (deck.pop(), deck.pop())
+
 
 
 if __name__ == "__main__":
