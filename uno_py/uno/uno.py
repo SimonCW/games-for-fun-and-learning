@@ -19,7 +19,7 @@ def do_card_action(
     gs: GameState,
 ) -> None | tuple[Card, Card] | tuple[Card, Card, Card, Card]:
     # Todo: Argh, this is mutating game_state. Maybe I could hand a new state back
-    match Card.face:
+    match gs.stack[0].face:
         case "reverse":
             print("Reversing play direction")
             gs.player_cycle.reverse()
