@@ -9,6 +9,14 @@ N_INITAL_CARDS = 7
 T = TypeVar("T")
 
 
+# from enum import Enum
+# class Color(Enum):
+#     BLUE = 1
+#     GREEN = 2
+#     RED = 3
+#     YELLOW = 4
+#     WILD = 5
+
 numbers = [int(x) for x in "0 1 2 3 4 5 6 7 8 9".split()]
 numbers_str = [x for x in "zero one two three four five six seven eight nine".split()]
 number_str2int = dict(zip(numbers_str, numbers))
@@ -25,6 +33,21 @@ class Card:
 
     def __post_init__(self):
         self.value = number_str2int.get(self.face, None)
+
+    # Define a dictionary that maps each color to an ANSI escape sequence
+    color_codes = {
+        "blue": "\033[34m",
+        "green": "\033[32m",
+        "red": "\033[31m",
+        "yellow": "\033[33m",
+        "wild": "\033[35m",
+    }
+
+    # Define a custom __repr__ method that includes the right color for each attribute
+    def __repr__(self):
+        # Get the color code and value name for this card
+        color_code = self.color_codes[self.color]
+        return f"{color_code}Card({self.value if self.value is not None else self.face})\033[0m"
 
 
 Deck = list[Card]
@@ -49,6 +72,7 @@ def main():
     do_card_action(Card=stack[0], player_cycle=player_cycle, deck=deck)
     up = next(player_cycle)
     print(f"Next Player: {up}")
+    playables(top_card=stack[0], hand=up.hand)
 
     # Game Loop
     while True:
@@ -61,7 +85,7 @@ def build_deck() -> Deck:
     d.extend(list(product(actions, colors)))
     d.extend(list(product(actions, colors)))
     d = [Card(color=color, face=face) for face, color in d]
-    wildcards = [Card(w, "wild") for w in wilds * 4]
+    wildcards = [Card(color="wild", face=w) for w in wilds * 4]
     d.extend(wildcards)
     shuffle(d)
     return d
@@ -116,11 +140,30 @@ def do_card_action(
             print("Reversing play direction")
             player_cycle.reverse()
             return
+        case "skip":
+            skipped = next(player_cycle)
+            print(f"Skipping player: {skipped.name}")
+            return
         case "draw2":
             print("Düdum, you have to draw 2")
             return (deck.pop(), deck.pop())
-        case other:
+        case "draw4":
+            print("Düdum, you have to draw 2")
+            return (deck.pop(), deck.pop())
+        case _:
             print("No specific action to take")
+
+
+def playables(top_card: Card, hand: Hand):
+    playables = [
+        c
+        for c in hand
+        if (c.color == top_card.color)
+        or (c.color == "wild")
+        or (c.face == top_card.face)
+    ]
+    print(f"Playble: {playables}")
+    return playables
 
 
 if __name__ == "__main__":
