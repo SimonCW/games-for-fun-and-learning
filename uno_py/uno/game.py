@@ -1,3 +1,5 @@
+from random import choice
+from typing import Optional
 from uno.state import GameState, Hand, Card
 
 
@@ -12,7 +14,8 @@ def main():
     # Todo: Maybe have a next method on player_cycle or next_player on state
     up = next(game_state.player_cycle)
     print(f"Next Player: {up}")
-    playables(top_card=game_state.stack[0], hand=up.hand)
+    card_played = strategy_random(top_card=game_state.stack[0], hand=up.hand)
+    print(f"Card played: {card_played}")
 
 
 def do_card_action(
@@ -38,7 +41,7 @@ def do_card_action(
             print("No specific action to take")
 
 
-def playables(top_card: Card, hand: Hand):
+def get_playables(top_card: Card, hand: Hand) -> list[Card]:
     playables = [
         c
         for c in hand
@@ -46,8 +49,17 @@ def playables(top_card: Card, hand: Hand):
         or (c.face == top_card.face)
         or (c.color == "wild")
     ]
-    print(f"Playble: {playables}")
+    if not playables:
+        print("¯\_(ツ)_/¯. Nothing to play")
+    print(f"Playable cards: {playables}")
     return playables
+
+
+def strategy_random(top_card: Card, hand: Hand) -> Optional[Card]:
+    try:
+        return choice(get_playables(top_card, hand))
+    except IndexError as e:
+        return None
 
 
 if __name__ == "__main__":
