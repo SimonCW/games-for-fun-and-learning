@@ -50,10 +50,45 @@ class Card:
         return f"{color_code}Card({self.value if self.value is not None else self.face})\033[0m"
 
 
-# Todo: Should deck also be a deque?
-Deck = list[Card]
-Stack = deque[Card]
 Hand = list[Card]
+
+#
+# @dataclass
+# class Stack:
+#     _stack: deque[Card]
+# @dataclass
+# class Deck:
+#     _deck: deque[Card]
+
+
+@dataclass
+class CommunityCards:
+    _deck: deque[Card]
+    _stack: deque[Card]
+    top_of_stack: Optional[Card]
+
+    def next_from_deck(self) -> Card:
+        try:
+            card = self._deck.pop()
+            return card
+        except IndexError:
+            self.shuffle_stack_as_deck()
+            card = self._deck.pop()
+            if card is None:
+                raise AssertionError("Card shouldn't be None here")
+            return card
+
+    def shuffle_stack_as_deck(self) -> None:
+        """Used when the deck is empty.
+
+        The stack except for the top card gets shuffled and becomes the new deck.
+        """
+
+        print(f"Shuffle stack of {len(self._stack)} cards and use as new deck.")
+        old_stack = self._stack
+        self._stack = deque([old_stack.pop()])
+        shuffle(old_stack)
+        self._deck = old_stack
 
 
 @dataclass
