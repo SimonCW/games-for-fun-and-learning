@@ -14,7 +14,7 @@ def main():
     # Todo: Maybe have a next method on player_cycle or next_player on state
     up = next(game_state.player_cycle)
     print(f"Next Player: {up}")
-    card_played = strategy_random(top_card=game_state.stack[0], hand=up.hand)
+    card_played = strategy_random(topcard=game_state.stack[0], hand=up.hand)  # type: ignore
     print(f"Card played: {card_played}")
 
 
@@ -29,7 +29,7 @@ def do_card_action(
             return
         case "skip":
             skipped = next(gs.player_cycle)
-            print(f"Skipping player: {skipped.name}")
+            print(f"Skipping player: {skipped.name}")  # type: ignore
             return
         case "draw2":
             print("Düdum, you have to draw 2")
@@ -50,7 +50,7 @@ def get_playables(top_card: Card, hand: Hand) -> list[Card]:
         or (c.color == "wild")
     ]
     if not playables:
-        print("¯\_(ツ)_/¯. Nothing to play")
+        print(r"¯\_(ツ)_/¯. Nothing to play")
     print(f"Playable cards: {playables}")
     return playables
 
@@ -58,7 +58,7 @@ def get_playables(top_card: Card, hand: Hand) -> list[Card]:
 def strategy_random(top_card: Card, hand: Hand) -> Optional[Card]:
     try:
         return choice(get_playables(top_card, hand))
-    except IndexError as e:
+    except IndexError as _:
         return None
 
 
