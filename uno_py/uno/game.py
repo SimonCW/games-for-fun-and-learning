@@ -7,9 +7,9 @@ def main():
     player_names = ["Jane", "Walther", "Jojo"]
     game_state = GameState.from_names(player_names)
     # Put first open card on the stack
-    game_state.stack.appendleft(game_state.deck.pop())
-    top_of_stack = game_state.stack[0]
-    print(f"Top of stack: {top_of_stack}")
+    game_state.community_cards.flip_first_card()
+    top_of_pile = game_state.community_cards._pile[0]
+    print(f"Top of stack: {top_of_pile}")
     do_card_action(gs=game_state)
     # Todo: Maybe have a next method on player_cycle or next_player on state
     up = next(game_state.player_cycle)

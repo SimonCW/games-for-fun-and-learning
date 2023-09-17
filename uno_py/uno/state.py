@@ -63,11 +63,14 @@ Hand = list[Card]
 
 @dataclass
 class CommunityCards:
+    # TODO: Define direction (left, right). Where do new cards go? From where to draw?
     _deck: deque[Card]
-    _stack: deque[Card]
-    top_of_stack: Optional[Card]
+    _pile: deque[Card]  # The discard pile
 
-    def next_from_deck(self) -> Card:
+    def flip_first_card(self) -> None:
+        self._pile.append(self.draw())
+
+    def draw(self) -> Card:
         try:
             card = self._deck.pop()
             return card
@@ -84,11 +87,22 @@ class CommunityCards:
         The stack except for the top card gets shuffled and becomes the new deck.
         """
 
-        print(f"Shuffle stack of {len(self._stack)} cards and use as new deck.")
-        old_stack = self._stack
-        self._stack = deque([old_stack.pop()])
+        print(f"Shuffle stack of {len(self._pile)} cards and use as new deck.")
+        old_stack = self._pile
+        self._pile = deque([old_stack.pop()])
         shuffle(old_stack)
         self._deck = old_stack
+
+    @classmethod
+    def new(cls) -> Self:
+        d = list(product(numbers_str, colors))
+        d.extend(list(product(actions, colors)))
+        d.extend(list(product(actions, colors)))
+        d = [Card(color=color, face=face) for face, color in d]
+        wildcards = [Card(color="wild", face=w) for w in wilds * 4]
+        d.extend(wildcards)
+        shuffle(d)
+        return cls(_deck=deque(d), _stack=deque())
 
 
 @dataclass
@@ -127,32 +141,21 @@ class PlayerCycle:
 @dataclass
 class GameState:
     player_cycle: PlayerCycle
-    deck: Deck
-    stack: Stack
+    community_cards: CommunityCards
 
     @classmethod
     def from_names(cls, names: list[str]) -> Self:
-        deck = build_deck()
+        c_cards = CommunityCards.new()
         initialized_players = []
         for name in names:
             cards = []
             for _ in range(N_INITAL_CARDS):
-                cards.append(deck.pop())
+                cards.append(c_cards.pop())
             initialized_players.append(Player(name=name, hand=cards))
         return cls(
-            player_cycle=PlayerCycle(initialized_players), deck=deck, stack=deque()
+            player_cycle=PlayerCycle(initialized_players),
+            community_cards=c_cards,
         )
-
-
-def build_deck() -> Deck:
-    d = list(product(numbers_str, colors))
-    d.extend(list(product(actions, colors)))
-    d.extend(list(product(actions, colors)))
-    d = [Card(color=color, face=face) for face, color in d]
-    wildcards = [Card(color="wild", face=w) for w in wilds * 4]
-    d.extend(wildcards)
-    shuffle(d)
-    return d
 
 
 if __name__ == "__main__":
