@@ -75,13 +75,13 @@ class CommunityCards:
             card = self._deck.pop()
             return card
         except IndexError:
-            self.shuffle_stack_as_deck()
+            self.shuffle_pile_as_deck()
             card = self._deck.pop()
             if card is None:
                 raise AssertionError("Card shouldn't be None here")
             return card
 
-    def shuffle_stack_as_deck(self) -> None:
+    def shuffle_pile_as_deck(self) -> None:
         """Used when the deck is empty.
 
         The stack except for the top card gets shuffled and becomes the new deck.
