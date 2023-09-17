@@ -33,10 +33,15 @@ def do_card_action(
             return
         case "draw2":
             print("Düdum, you have to draw 2")
-            return (gs.deck.pop(), gs.deck.pop())
+            return (gs.community_cards.draw(), gs.community_cards.draw())
         case "draw4":
             print("Puh, you have to draw 4")
-            return (gs.deck.pop(), gs.deck.pop(), gs.deck.pop(), gs.deck.pop())
+            return (
+                gs.community_cards.draw(),
+                gs.community_cards.draw(),
+                gs.community_cards.draw(),
+                gs.community_cards.draw(),
+            )
         case _:
             print("No specific action to take")
 
