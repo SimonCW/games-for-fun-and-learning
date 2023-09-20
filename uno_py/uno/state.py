@@ -118,8 +118,11 @@ class Player:
         return playables
 
     def strategy_random(self, top_card: Card) -> Optional[Card]:
+        # TODO: Strategies should be supplied to player aka strategy pattern
         try:
-            return choice(self.get_playables(top_card))
+            card = choice(self.get_playables(top_card))
+            self.hand.remove(card)
+            return card
         except IndexError as _:
             return None
 

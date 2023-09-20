@@ -1,6 +1,4 @@
-from random import choice
-from typing import Optional
-from uno.state import GameState, Hand, Card, Player
+from uno.state import GameState, Card, Player
 
 
 def main():
@@ -8,18 +6,35 @@ def main():
     game_state = GameState.from_names(player_names)
     # Put first open card on the pile
     game_state.community_cards.flip_first_card()
+    # TODO: Shouldn't have to access private attribute _pile here.
     top_of_pile = game_state.community_cards._pile[0]
     print(f"Top of pile: {top_of_pile}")
-    cards = do_card_action(gs=game_state)
-    # Todo: Maybe have a next method on player_cycle or next_player on state
-    up: Player = next(game_state.player_cycle)  # type: ignore
-    if cards:
-        up.hand.extend(cards)
-    print(f"Next Player: {up}")
-    card_played = strategy_random(
-        top_card=game_state.community_cards._pile[0], hand=up.hand  # type: ignore
-    )
-    print(f"Card played: {card_played}")
+    # TODO: Maybe have a next method on player_cycle or next_player on state
+    round = 1
+    while True:
+        if round == 1:
+            cards = do_card_action(gs=game_state)
+            up: Player = next(game_state.player_cycle)  # type: ignore
+        up: Player = next(game_state.player_cycle)  # type: ignore
+        cards = do_card_action(gs=game_state)
+        if cards:
+            up.hand.extend(cards)
+        print(f"Next Player: {up}")
+        card_played = up.strategy_random(
+            top_card=game_state.community_cards._pile[0]  # type: ignore
+        )
+        if card_played:
+            game_state.community_cards._pile.appendleft(card_played)
+        else:
+            up.hand.extend([game_state.community_cards.draw()])
+            card_played = up.strategy_random(
+                top_card=game_state.community_cards._pile[0]  # type: ignore
+            )
+            if card_played:
+                game_state.community_cards._pile.appendleft(card_played)
+        round += 1
+
+        print(f"Card played: {card_played}")
 
 
 def do_card_action(
