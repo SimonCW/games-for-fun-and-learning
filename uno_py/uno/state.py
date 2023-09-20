@@ -52,14 +52,6 @@ class Card:
 
 Hand = list[Card]
 
-#
-# @dataclass
-# class Stack:
-#     _stack: deque[Card]
-# @dataclass
-# class Deck:
-#     _deck: deque[Card]
-
 
 @dataclass
 class CommunityCards:
@@ -84,14 +76,14 @@ class CommunityCards:
     def shuffle_pile_as_deck(self) -> None:
         """Used when the deck is empty.
 
-        The stack except for the top card gets shuffled and becomes the new deck.
+        The pile except for the top card gets shuffled and becomes the new deck.
         """
 
         print(f"Shuffle stack of {len(self._pile)} cards and use as new deck.")
-        old_stack = self._pile
-        self._pile = deque([old_stack.pop()])
-        shuffle(old_stack)
-        self._deck = old_stack
+        old_pile = self._pile
+        self._pile = deque([old_pile.pop()])
+        shuffle(old_pile)
+        self._deck = old_pile
 
     @classmethod
     def new(cls) -> Self:
@@ -102,7 +94,7 @@ class CommunityCards:
         wildcards = [Card(color="wild", face=w) for w in wilds * 4]
         d.extend(wildcards)
         shuffle(d)
-        return cls(_deck=deque(d), _stack=deque())
+        return cls(_deck=deque(d), _pile=deque())
 
 
 @dataclass
@@ -140,6 +132,12 @@ class PlayerCycle:
 
 @dataclass
 class GameState:
+    """Encapsulates the mutable state of the game.
+
+    Helper methods are implemented if they cover basic game mechanics. Rules and
+    strategies are implemented separately to stay flexible.
+    """
+
     player_cycle: PlayerCycle
     community_cards: CommunityCards
 
@@ -150,7 +148,7 @@ class GameState:
         for name in names:
             cards = []
             for _ in range(N_INITAL_CARDS):
-                cards.append(c_cards.pop())
+                cards.append(c_cards.draw())
             initialized_players.append(Player(name=name, hand=cards))
         return cls(
             player_cycle=PlayerCycle(initialized_players),
