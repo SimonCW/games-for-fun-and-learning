@@ -9,17 +9,38 @@ def main():
     # TODO: Shouldn't have to access private attribute _pile here.
     top_of_pile = game_state.community_cards._pile[0]
     print(f"Top of pile: {top_of_pile}")
-    # TODO: Maybe have a next method on player_cycle or next_player on state
     round = 1
     while True:
-        if round == 1:
-            cards = do_card_action(gs=game_state)
-            up: Player = next(game_state.player_cycle)  # type: ignore
+        match top_of_pile.face:
+            case "reverse":
+                print("Reversing play direction")
+                game_state.player_cycle.reverse()
+            case "skip":
+                skipped: Player = next(game_state.player_cycle)  # type: ignore
+                print(f"Skipping player: {skipped.name}")
         up: Player = next(game_state.player_cycle)  # type: ignore
-        cards = do_card_action(gs=game_state)
-        if cards:
-            up.hand.extend(cards)
-        print(f"Next Player: {up}")
+        print(f"Player {up} is up")
+        match top_of_pile.face:
+            case "draw2":
+                print("Düdum, you have to draw 2")
+                up.hand.extend(
+                    [
+                        game_state.community_cards.draw(),
+                        game_state.community_cards.draw(),
+                    ]
+                )
+            case "draw4":
+                print("Puh, you have to draw 4")
+                up.hand.extend(
+                    [
+                        game_state.community_cards.draw(),
+                        game_state.community_cards.draw(),
+                        game_state.community_cards.draw(),
+                        game_state.community_cards.draw(),
+                    ]
+                )
+            case _:
+                print("No specific action to take")
         card_played = up.strategy_random(
             top_card=game_state.community_cards._pile[0]  # type: ignore
         )
@@ -33,8 +54,8 @@ def main():
             if card_played:
                 game_state.community_cards._pile.appendleft(card_played)
         round += 1
-
         print(f"Card played: {card_played}")
+        # TODO: Add win condition. Maybe as method on player?
 
 
 def do_card_action(
