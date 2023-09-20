@@ -1,6 +1,6 @@
 from random import choice
 from typing import Optional
-from uno.state import GameState, Hand, Card
+from uno.state import GameState, Hand, Card, Player
 
 
 def main():
@@ -10,9 +10,11 @@ def main():
     game_state.community_cards.flip_first_card()
     top_of_pile = game_state.community_cards._pile[0]
     print(f"Top of pile: {top_of_pile}")
-    do_card_action(gs=game_state)
+    cards = do_card_action(gs=game_state)
     # Todo: Maybe have a next method on player_cycle or next_player on state
-    up = next(game_state.player_cycle)
+    up: Player = next(game_state.player_cycle)  # type: ignore
+    if cards:
+        up.hand.extend(cards)
     print(f"Next Player: {up}")
     card_played = strategy_random(
         top_card=game_state.community_cards._pile[0], hand=up.hand  # type: ignore
@@ -46,27 +48,6 @@ def do_card_action(
             )
         case _:
             print("No specific action to take")
-
-
-def get_playables(top_card: Card, hand: Hand) -> list[Card]:
-    playables = [
-        c
-        for c in hand
-        if (c.color == top_card.color)
-        or (c.face == top_card.face)
-        or (c.color == "wild")
-    ]
-    if not playables:
-        print(r"¯\_(ツ)_/¯. Nothing to play")
-    print(f"Playable cards: {playables}")
-    return playables
-
-
-def strategy_random(top_card: Card, hand: Hand) -> Optional[Card]:
-    try:
-        return choice(get_playables(top_card, hand))
-    except IndexError as _:
-        return None
 
 
 if __name__ == "__main__":

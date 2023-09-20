@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from itertools import product
-from random import shuffle
+from random import shuffle, choice
 from typing import Iterable, Optional, Self, TypeVar
 from collections import deque
 
@@ -47,7 +47,9 @@ class Card:
     def __repr__(self):
         # Get the color code and value name for this card
         color_code = self.color_codes[self.color]
-        return f"{color_code}Card({self.value if self.value is not None else self.face})\033[0m"
+        return f"""{color_code}Card({
+        self.value if self.value is not None else self.face
+        })\033[0m"""
 
 
 Hand = list[Card]
@@ -101,6 +103,25 @@ class CommunityCards:
 class Player:
     hand: Hand
     name: str = "Jane"
+
+    def get_playables(self, top_card: Card) -> list[Card]:
+        playables = [
+            c
+            for c in self.hand
+            if (c.color == top_card.color)
+            or (c.face == top_card.face)
+            or (c.color == "wild")
+        ]
+        if not playables:
+            print(r"¯\_(ツ)_/¯. Nothing to play")
+        print(f"Playable cards: {playables}")
+        return playables
+
+    def strategy_random(self, top_card: Card) -> Optional[Card]:
+        try:
+            return choice(self.get_playables(top_card))
+        except IndexError as _:
+            return None
 
 
 class PlayerCycle:
