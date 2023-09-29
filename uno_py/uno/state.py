@@ -8,15 +8,6 @@ N_INITAL_CARDS = 7
 
 T = TypeVar("T")
 
-
-# from enum import Enum
-# class Color(Enum):
-#     BLUE = 1
-#     GREEN = 2
-#     RED = 3
-#     YELLOW = 4
-#     WILD = 5
-
 numbers = [int(x) for x in "0 1 2 3 4 5 6 7 8 9".split()]
 numbers_str = [x for x in "zero one two three four five six seven eight nine".split()]
 number_str2int = dict(zip(numbers_str, numbers))
