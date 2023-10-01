@@ -18,7 +18,7 @@ pub struct Deck {
 impl Deck {
     pub fn new() -> Deck {
         let mut cards = Vec::<Card>::new();
-        for color in COLORS {
+        for color in &COLORS {
             for value in VALUES {
                 let card = Card {
                     color: color.clone(),
@@ -29,6 +29,11 @@ impl Deck {
             }
         }
         Deck { cards }
+    }
+}
+impl Default for Deck {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
