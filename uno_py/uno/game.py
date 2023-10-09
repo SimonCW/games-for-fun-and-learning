@@ -18,27 +18,27 @@ def main():
             case "skip":
                 skipped: Player = next(game_state.player_cycle)  # type: ignore
                 print(f"Skipping player: {skipped.name}")
+            case _:
+                pass
         up: Player = next(game_state.player_cycle)  # type: ignore
         print(f"Player {up} is up")
         match top_of_pile.face:
             case "draw2":
-                print("Düdum, you have to draw 2")
-                up.hand.extend(
-                    [
-                        game_state.community_cards.draw(),
-                        game_state.community_cards.draw(),
-                    ]
-                )
+                to_draw = [
+                    game_state.community_cards.draw(),
+                    game_state.community_cards.draw(),
+                ]
+                print(f"🤷, you have to draw 2: {to_draw}")
+                up.hand.extend(to_draw)
             case "draw4":
-                print("Puh, you have to draw 4")
-                up.hand.extend(
-                    [
-                        game_state.community_cards.draw(),
-                        game_state.community_cards.draw(),
-                        game_state.community_cards.draw(),
-                        game_state.community_cards.draw(),
-                    ]
-                )
+                to_draw = [
+                    game_state.community_cards.draw(),
+                    game_state.community_cards.draw(),
+                    game_state.community_cards.draw(),
+                    game_state.community_cards.draw(),
+                ]
+                print(f"🤯, you have to draw 4: {to_draw}")
+                up.hand.extend(to_draw)
             case _:
                 print("No specific action to take")
         card_played = up.strategy_random(
@@ -55,35 +55,8 @@ def main():
                 game_state.community_cards._pile.appendleft(card_played)
         round += 1
         print(f"Card played: {card_played}")
-        # TODO: Add win condition. Maybe as method on player?
-
-
-def do_card_action(
-    gs: GameState,
-) -> None | tuple[Card, Card] | tuple[Card, Card, Card, Card]:
-    # Todo: Argh, this is mutating game_state. Maybe I could hand a new state back
-    match gs.community_cards._pile[0].face:
-        case "reverse":
-            print("Reversing play direction")
-            gs.player_cycle.reverse()
-            return
-        case "skip":
-            skipped = next(gs.player_cycle)
-            print(f"Skipping player: {skipped.name}")  # type: ignore
-            return
-        case "draw2":
-            print("Düdum, you have to draw 2")
-            return (gs.community_cards.draw(), gs.community_cards.draw())
-        case "draw4":
-            print("Puh, you have to draw 4")
-            return (
-                gs.community_cards.draw(),
-                gs.community_cards.draw(),
-                gs.community_cards.draw(),
-                gs.community_cards.draw(),
-            )
-        case _:
-            print("No specific action to take")
+        if game_state.check_win_condition():
+            break
 
 
 if __name__ == "__main__":

@@ -1,12 +1,10 @@
 from dataclasses import dataclass, field
 from itertools import product
 from random import shuffle, choice
-from typing import Iterable, Optional, Self, TypeVar
+from typing import Iterable, Optional, Self
 from collections import deque
 
 N_INITAL_CARDS = 7
-
-T = TypeVar("T")
 
 numbers = [int(x) for x in "0 1 2 3 4 5 6 7 8 9".split()]
 numbers_str = [x for x in "zero one two three four five six seven eight nine".split()]
@@ -121,13 +119,13 @@ class Player:
 class PlayerCycle:
     """Gives the next Player. Can be reversed."""
 
-    def __init__(self, players: Iterable[T]) -> None:
-        self._items: list[T] = list(players)
+    def __init__(self, players: Iterable[Player]) -> None:
+        self._items: list[Player] = list(players)
         self._pos = None
         # 1 for normal direction, -1 for reversed
         self._direction = 1
 
-    def __next__(self) -> T:
+    def __next__(self) -> Player:
         # First play in the game
         if self._pos is None:
             self._pos = 0 if self._direction == 1 else -1
@@ -169,6 +167,14 @@ class GameState:
             player_cycle=PlayerCycle(initialized_players),
             community_cards=c_cards,
         )
+
+    def check_win_condition(self):
+        # Copy to avoid mutating the player cycle
+        for player in self.player_cycle._items.copy():
+            if len(player.hand) == 0:
+                print(f"Player {player.name} has won!")
+                return True
+        return False
 
 
 if __name__ == "__main__":
