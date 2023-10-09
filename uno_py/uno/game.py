@@ -1,4 +1,4 @@
-from uno.state import GameState, Card, Player
+from uno.state import GameState, Player
 
 
 def main():
