@@ -1,6 +1,6 @@
 from hypothesis import given
 from hypothesis.strategies import integers, lists, sampled_from, just, builds
-from uno.state import PlayerCycle
+from uno.state import PlayerCycle, Player
 
 
 first_names = ["Alice", "Bob", "Cesar", "Zoli"]
@@ -15,7 +15,8 @@ name = builds(
 names_st = lists(elements=name, min_size=2, max_size=11)
 
 
-def test_player_cycle_happy(names=first_names):
+def test_player_cycle_happy():
+    names = ["Alice", "Bob", "Cesar", "Zoli"]
     player_cycle = PlayerCycle(names)
     assert next(player_cycle) == "Alice"
     assert next(player_cycle) == "Bob"
