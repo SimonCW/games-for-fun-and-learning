@@ -52,7 +52,7 @@ def main():
             top_card=game_state.community_cards._pile[0]  # type: ignore
         )
         if card_played:
-            game_state.community_cards._pile.append(card_played)
+            game_state.community_cards._pile.appendleft(card_played)
         else:
             to_draw = game_state.community_cards.draw()
             print(f"☝️, You cannot play, you have to draw 1: {to_draw}")
@@ -61,10 +61,11 @@ def main():
                 top_card=game_state.community_cards._pile[0]  # type: ignore
             )
             if card_played:
-                game_state.community_cards._pile.append(card_played)
+                game_state.community_cards._pile.appendleft(card_played)
         print(f"Card played: {card_played}")
         if game_state.check_win_condition():
             break
+        print(f"{game_state.community_cards._pile}")
         top_of_pile = game_state.community_cards._pile[0]
         round += 1
 
