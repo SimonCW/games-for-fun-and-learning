@@ -53,6 +53,10 @@ class CommunityCards:
     _deck: deque[Card]
     _pile: deque[Card]  # The discard pile
 
+    @property
+    def top_card(self) -> Card:
+        return self._pile[-1]
+
     def flip_first_card(self) -> None:
         self._pile.append(self.draw())
 
@@ -66,6 +70,9 @@ class CommunityCards:
             if card is None:
                 raise AssertionError("Card shouldn't be None here")
             return card
+
+    def put_to_pile(self, card: Card) -> None:
+        self._pile.append(card)
 
     def shuffle_pile_as_deck(self) -> None:
         """Used when the deck is empty.
