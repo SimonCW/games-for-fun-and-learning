@@ -1,9 +1,9 @@
-from uno.state import GameState, Player
+from uno.state import gs, Player
 
 
 def main():
     player_names = ["Jane", "Walther", "Jojo"]
-    game_state = GameState.from_names(player_names)
+    game_state = gs.from_names(player_names)
     # Put first open card on the pile
     game_state.community_cards.flip_first_card()
     # TODO: Shouldn't have to access private attribute _pile here.
