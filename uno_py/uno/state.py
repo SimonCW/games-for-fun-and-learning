@@ -107,22 +107,25 @@ class Player:
 class PlayerCycle:
     """Gives the next Player. Can be reversed."""
 
-    def __init__(self, players: Iterable[T]) -> None:
+    # Note: The type hints for returning a TypeVar here don't work. There is a
+    #   bug in mypy/pyright
+
+    def __init__(self, players: Iterable[T]) -> None:  # type: ignore
         self._items: list[T] = list(players)
         self._pos = None
         # 1 for normal direction, -1 for reversed
         self._direction = 1
 
-    def __next__(self) -> T:
+    def __next__(self) -> T:  # type: ignore
         # First play in the game
         if self._pos is None:
             self._pos = 0 if self._direction == 1 else -1
-            return self._items[self._pos]
+            return self._items[self._pos]  # type: ignore
 
         # Modulo avoids positions that are "out of index".
         self._pos = (self._direction + self._pos) % len(self._items)
         element = self._items[self._pos]
-        return element
+        return element  # type: ignore
 
     def __iter__(self):
         return self
@@ -158,7 +161,8 @@ class GameState:
 
     def check_win_condition(self):
         # Copy to avoid mutating the player cycle
-        for player in self.player_cycle._items.copy():
+        for player in self.player_cycle._items.copy():  # type: ignore
+            player: Player
             if len(player.hand) == 0:
                 print(f"Player {player.name} has won!")
                 return True
