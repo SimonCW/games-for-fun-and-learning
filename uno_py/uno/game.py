@@ -1,4 +1,6 @@
-from uno.state import GameState, Player
+from uno.state import GameState, Player, Card
+from random import choice
+from typing import Optional
 
 
 def main():
@@ -27,7 +29,6 @@ def main():
                 skipped: Player = next(gs.player_cycle)  # type: ignore
                 print(f"🛑, Skipping player: {skipped.name}")
         up: Player = next(gs.player_cycle)  # type: ignore
-        print(f"Player {up} is up")
         match gs.community_cards.top_card.face:
             case "draw2":
                 to_draw = [
@@ -47,25 +48,49 @@ def main():
                 up.hand.extend(to_draw)
             case _:
                 print("No action to take")
-        card_played = up.strategy_random(
-            top_card=gs.community_cards._pile[0]  # type: ignore
-        )
+        print(f"{up} is up")
+        card_played = strategy_random(player=up, top_card=gs.community_cards.top_card)
         if card_played:
             gs.community_cards.put_to_pile(card_played)
         else:
             to_draw = gs.community_cards.draw()
             print(f"☝️, You cannot play, you have to draw 1: {to_draw}")
             up.hand.extend([])
-            card_played = up.strategy_random(
-                top_card=gs.community_cards.top_card  # type: ignore
+            card_played = strategy_random(
+                player=up, top_card=gs.community_cards.top_card
             )
             if card_played:
                 gs.community_cards.put_to_pile(card_played)
         print(f"Card played: {card_played}")
         if gs.check_win_condition():
             break
-        print(f"{gs.community_cards._pile}")
         round += 1
+
+
+def get_playables(hand, top_card: Card) -> list[Card]:
+    playables = [
+        c
+        for c in hand
+        if (c.color == top_card.color)
+        or (c.face == top_card.face)
+        or (c.color == "wild")
+        or (top_card.color == "wild")
+    ]
+    if not playables:
+        print(r"¯\_(ツ)_/¯. Nothing to play")
+    print(f"Playable cards: {playables}")
+    return playables
+
+
+def strategy_random(player: Player, top_card: Card) -> Optional[Card]:
+    # TODO: Strategies could be supplied to player aka strategy pattern
+    #   to enable different strategies for different players.
+    try:
+        card = choice(get_playables(player.hand, top_card))
+        player.hand.remove(card)
+        return card
+    except IndexError as _:
+        return None
 
 
 if __name__ == "__main__":

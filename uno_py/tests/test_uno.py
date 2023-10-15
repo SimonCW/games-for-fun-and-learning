@@ -1,6 +1,6 @@
 from hypothesis import given
 from hypothesis.strategies import integers, lists, sampled_from, just, builds
-from uno.state import PlayerCycle, Player
+from uno.state import PlayerCycle
 
 
 first_names = ["Alice", "Bob", "Cesar", "Zoli"]
