@@ -1,14 +1,12 @@
-// Using these consts b/c it's the easiest way to iterate over the colors
+// Using these consts b/c it's the easiest way to iterate over the enums ...
 const COLOR_SPECIALS: [ColoredCard; 3] =
     [ColoredCard::Skip, ColoredCard::Reverse, ColoredCard::Draw];
-const WILD_SPECIALS: [&str; 2] = ["Draw Four", "Wish Color"];
 const COLORS: [CardColor; 4] = [
     CardColor::Blue,
     CardColor::Green,
     CardColor::Red,
     CardColor::Yellow,
 ];
-const VALUES: [u8; 10] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum CardColor {
@@ -29,8 +27,8 @@ pub enum ColoredCard {
 #[derive(Debug, Clone)]
 pub enum Card {
     Colored(CardColor, ColoredCard),
-    Wild,
-    WildDrawFour,
+    WildWishColor,
+    WildWishColorDrawFour,
 }
 
 #[derive(Debug)]
@@ -39,26 +37,44 @@ pub struct Deck {
 }
 
 impl Deck {
+    /// Create a new deck of 108 cards. This is the standard Uno deck prior to 2018.
     pub fn new() -> Deck {
         let mut cards = Vec::<Card>::new();
         for color in &COLORS {
             for _ in 0..2 {
-                for value in VALUES {
-                    let card = Card::Colored(color.clone(), ColoredCard::Number(value));
-                    cards.push(card);
+                // Numbers except 0
+                for value in 1..10 {
+                    cards.push(Card::Colored(color.clone(), ColoredCard::Number(value)));
                 }
+                // Specials
                 for special in &COLOR_SPECIALS {
-                    let card = Card::Colored(color.clone(), special.clone());
-                    cards.push(card);
+                    cards.push(Card::Colored(color.clone(), special.clone()));
                 }
             }
+            // Number 0, 1 per color
+            cards.push(Card::Colored(color.clone(), ColoredCard::Number(0)));
         }
-
+        // Wildcards, 4 of each
+        for _ in 0..4 {
+            cards.push(Card::WildWishColor);
+            cards.push(Card::WildWishColorDrawFour);
+        }
         Deck { cards }
     }
 }
 impl Default for Deck {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_new_deck_has_108() {
+        let deck = Deck::new();
+        assert_eq!(deck.cards.len(), 108);
     }
 }
