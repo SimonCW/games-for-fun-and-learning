@@ -1,6 +1,12 @@
+use rand::seq::SliceRandom;
+use rand::thread_rng;
+
 // Using these consts b/c it's the easiest way to iterate over the enums ...
-const COLOR_SPECIALS: [ColoredCard; 3] =
-    [ColoredCard::Skip, ColoredCard::Reverse, ColoredCard::Draw];
+const COLOR_SPECIALS: [ColoredCard; 3] = [
+    ColoredCard::Skip,
+    ColoredCard::Reverse,
+    ColoredCard::DrawTwo,
+];
 const COLORS: [CardColor; 4] = [
     CardColor::Blue,
     CardColor::Green,
@@ -21,7 +27,7 @@ pub enum ColoredCard {
     Number(u8),
     Skip,
     Reverse,
-    Draw,
+    DrawTwo,
 }
 
 #[derive(Debug, Clone)]
@@ -59,6 +65,9 @@ impl Deck {
             cards.push(Card::WildWishColor);
             cards.push(Card::WildWishColorDrawFour);
         }
+        //shuffle
+        let mut rng = thread_rng();
+        cards.shuffle(&mut rng);
         Deck { cards }
     }
 }
