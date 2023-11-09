@@ -1,8 +1,8 @@
+from collections import deque
 from dataclasses import dataclass, field
 from itertools import product
 from random import shuffle
-from typing import Iterable, Optional, Self, TypeVar
-from collections import deque
+from typing import Generic, Iterable, Optional, Self, TypeVar
 
 N_INITAL_CARDS = 7
 
@@ -104,31 +104,31 @@ class Player:
     name: str = "Jane"
 
 
-class PlayerCycle:
+class PlayerCycle(Generic[T]):
     """Gives the next Player. Can be reversed."""
 
     # Note: The type hints for returning a TypeVar here don't work. There is a
     #   bug in mypy/pyright
 
-    def __init__(self, players: Iterable[T]) -> None:  # type: ignore
-        self._items: list[T] = list(players)
+    def __init__(self, players: list[T]) -> None:
+        self._items = list(players)
         self._pos = None
         # 1 for normal direction, -1 for reversed
         self._direction = 1
 
-    def __next__(self) -> T:  # type: ignore
+    def __iter__(self) -> "PlayerCycle[T]":
+        return self
+
+    def __next__(self) -> T:
         # First play in the game
         if self._pos is None:
             self._pos = 0 if self._direction == 1 else -1
-            return self._items[self._pos]  # type: ignore
+            return self._items[self._pos]
 
         # Modulo avoids positions that are "out of index".
         self._pos = (self._direction + self._pos) % len(self._items)
         element = self._items[self._pos]
-        return element  # type: ignore
-
-    def __iter__(self):
-        return self
+        return element
 
     def reverse(self):
         self._direction *= -1
@@ -148,7 +148,7 @@ class GameState:
     @classmethod
     def from_names(cls, names: list[str]) -> Self:
         c_cards = CommunityCards.new()
-        initialized_players = []
+        initialized_players: list[Player] = []
         for name in names:
             cards = []
             for _ in range(N_INITAL_CARDS):

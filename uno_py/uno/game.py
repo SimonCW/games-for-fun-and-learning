@@ -26,7 +26,7 @@ def main():
                 print("🔄, Reversing play direction")
                 gs.player_cycle.reverse()
             case "skip":
-                skipped: Player = next(gs.player_cycle)  # type: ignore
+                skipped = next(gs.player_cycle)
                 print(f"🛑, Skipping player: {skipped.name}")
         up: Player = next(gs.player_cycle)  # type: ignore
         match gs.community_cards.top_card.face:
