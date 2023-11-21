@@ -82,7 +82,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_new_deck_has_108() {
+    fn test_new_deck_has_108_cards() {
         let deck = Deck::new();
         assert_eq!(deck.cards.len(), 108);
     }
