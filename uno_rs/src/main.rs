@@ -40,15 +40,18 @@ impl PlayerCycle {
         }
     }
 }
-//     def __init__(self, players: list[T]) -> None:
-//         self._items = list(players)
-//         self._pos = None
-//         # 1 for normal direction, -1 for reversed
-//         self._direction = 1
-//
-//     def __iter__(self) -> "PlayerCycle[T]":
-//         return self
-//
+
+impl Iterator for PlayerCycle {
+    type Item = String;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        // Modulo avoids positions that are out of bounds.
+        // TODO: Negative indexing doesn't work in Rust. I have to do sth. else here. How nice that
+        // I find this out via the compiler that doesn't allow adding i8 to usize ... makes sense
+        self.pos = ((self.pos + self.direction) % self.items.len());
+        Some(self.items[self.pos].clone())
+    }
+}
 //     def __next__(self) -> T:
 //         # First play in the game
 //         if self._pos is None:
