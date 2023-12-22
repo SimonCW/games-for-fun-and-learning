@@ -5,4 +5,5 @@ Just implementing (simulations of) games for fun. This is the ideal programming 
 * No ChatGPT, no Copilot (takes the fun away)
 * No new big libraries to avoid needing to learn their API (Rust is a bit of an exception since the standard library is not as extensive as Python's)
 * No planning of features, just coding (code one to throw away)
+* Always end the session with a bug or an open Todo
 
