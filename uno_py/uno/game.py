@@ -55,7 +55,7 @@ def main():
         else:
             to_draw = gs.community_cards.draw()
             print(f"☝️, You cannot play, you have to draw 1: {to_draw}")
-            up.hand.extend([])
+            up.hand.extend([to_draw])
             card_played = strategy_random(
                 player=up, top_card=gs.community_cards.top_card
             )
