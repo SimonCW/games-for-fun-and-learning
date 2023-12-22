@@ -2,7 +2,7 @@ from collections import deque
 from dataclasses import dataclass, field
 from itertools import product
 from random import shuffle
-from typing import Generic, Iterable, Optional, Self, TypeVar
+from typing import Generic, Optional, Self, TypeVar
 
 N_INITAL_CARDS = 7
 
