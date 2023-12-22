@@ -9,22 +9,16 @@ N_INITAL_CARDS = 7
 T = TypeVar("T")
 
 
-numbers = [int(x) for x in "0 1 2 3 4 5 6 7 8 9".split()]
-numbers_str = [x for x in "zero one two three four five six seven eight nine".split()]
-number_str2int = dict(zip(numbers_str, numbers))
-colors = "blue red yellow green".split()
-actions = "draw2 skip reverse".split()
-wilds = "draw4 wishcolor".split()
+COLORS = "blue red yellow green".split()
+ACTIONS = "draw2 skip reverse".split()
+WILDS = "draw4 wishcolor".split()
 
 
 @dataclass
 class Card:
     color: str
     face: str
-    value: Optional[int] = field(init=False)
-
-    def __post_init__(self):
-        self.value = number_str2int.get(self.face, None)
+    value: Optional[int] = None
 
     # Define a dictionary that maps each color to an ANSI escape sequence
     color_codes = {
@@ -88,12 +82,17 @@ class CommunityCards:
 
     @classmethod
     def new(cls) -> Self:
-        d = list(product(numbers_str, colors))
-        d.extend(list(product(actions, colors)))
-        d.extend(list(product(actions, colors)))
-        d = [Card(color=color, face=face) for face, color in d]
-        wildcards = [Card(color="wild", face=w) for w in wilds * 4]
-        d.extend(wildcards)
+        d = []
+        for color in COLORS:
+            for _ in range(2):
+                for number in range(1, 10):
+                    d.append(Card(color=color, face=str(number), value=number))
+                for action in ACTIONS:
+                    d.append(Card(color=color, face=action))
+            d.append(Card(color=color, face="0", value=0))
+        for _ in range(4):
+            for w in WILDS:
+                d.append(Card(color="wild", face=w))
         shuffle(d)
         return cls(_deck=deque(d), _pile=deque())
 
