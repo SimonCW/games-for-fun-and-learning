@@ -26,7 +26,7 @@ pub fn main() {
 pub struct PlayerCycle {
     items: Vec<String>,
     last_index: usize,
-    pos: Option<isize>,
+    pos: Option<usize>,
     direction: isize,
 }
 
@@ -48,27 +48,14 @@ impl Iterator for PlayerCycle {
     type Item = String;
 
     fn next(&mut self) -> Option<Self::Item> {
-        // Modulo avoids positions that are out of bounds and negative values
-        // Increment position
-        if let Some(pos) = self.pos {
-            // TODO: Avoid conversion and possible wrapping error
-            let result = (pos + self.direction) % self.items.len() as isize;
-            let non_negative_result = if result < 0 {
-                result + self.items.len() as isize
-            } else {
-                result
-            };
-            self.pos = Some(non_negative_result);
-        } else {
-            self.pos = Some(0);
-        }
-        Some(
-            self.items[usize::try_from(
-                dbg!(self.pos).expect("Position should be set after the previous if else"),
-            )
-            .expect("Position shouldn't be negative or so big as to truncate")]
-            .clone(),
-        )
+        let len = self.items.len() as isize;
+        // Initialize or update the position
+        self.pos = Some(match self.pos {
+            // rem_euclid is basically modulo but always returning positive numbers
+            Some(pos) => (pos as isize + self.direction).rem_euclid(len) as usize,
+            None => 0, // Default to the start if it's the first call
+        });
+        Some(self.items[self.pos.expect("Shouldn't be None at this point")].clone())
     }
 }
 
