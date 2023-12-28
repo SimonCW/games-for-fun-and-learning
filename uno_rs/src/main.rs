@@ -26,8 +26,8 @@ pub fn main() {
 pub struct PlayerCycle {
     items: Vec<String>,
     last_index: usize,
-    pos: usize,
-    direction: i8,
+    pos: Option<isize>,
+    direction: isize,
 }
 
 impl PlayerCycle {
@@ -35,9 +35,12 @@ impl PlayerCycle {
         PlayerCycle {
             last_index: &names.len() - 1,
             items: names,
-            pos: 0,
+            pos: None,
             direction: 1,
         }
+    }
+    pub fn reverse(&mut self) {
+        self.direction *= -1;
     }
 }
 
@@ -45,29 +48,48 @@ impl Iterator for PlayerCycle {
     type Item = String;
 
     fn next(&mut self) -> Option<Self::Item> {
-        // Modulo avoids positions that are out of bounds.
-        // TODO: Negative indexing doesn't work in Rust. I have to do sth. else here. How nice that
-        // I find this out via the compiler that doesn't allow adding i8 to usize ... makes sense
-        self.pos = ((self.pos + self.direction) % self.items.len());
-        Some(self.items[self.pos].clone())
+        // Modulo avoids positions that are out of bounds and negative values
+        // Increment position
+        if let Some(pos) = self.pos {
+            // TODO: Avoid conversion and possible wrapping error
+            let result = (pos + self.direction) % self.items.len() as isize;
+            let non_negative_result = if result < 0 {
+                result + self.items.len() as isize
+            } else {
+                result
+            };
+            self.pos = Some(non_negative_result);
+        } else {
+            self.pos = Some(0);
+        }
+        Some(
+            self.items[usize::try_from(
+                dbg!(self.pos).expect("Position should be set after the previous if else"),
+            )
+            .expect("Position shouldn't be negative or so big as to truncate")]
+            .clone(),
+        )
     }
 }
-//     def __next__(self) -> T:
-//         # First play in the game
-//         if self._pos is None:
-//             self._pos = 0 if self._direction == 1 else -1
-//             return self._items[self._pos]
-//
-//         # Modulo avoids positions that are "out of index".
-//         self._pos = (self._direction + self._pos) % len(self._items)
-//         element = self._items[self._pos]
-//         return element
-//
-//     def reverse(self):
-//         self._direction *= -1
-//
-//
-//
-// ["A", "B", "C", "D"];
-//        x
-// ["D", "C", "B", "A"];
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_player_cycle_works() {
+        let names: Vec<String> = vec!["Jane", "Walther", "Jojo", "Alex"]
+            .iter()
+            .map(std::string::ToString::to_string)
+            .collect();
+        let mut cycle = PlayerCycle::new(names);
+        assert_eq!(cycle.next(), Some("Jane".to_string()));
+        assert_eq!(cycle.next(), Some("Walther".to_string()));
+        assert_eq!(cycle.next(), Some("Jojo".to_string()));
+        assert_eq!(cycle.next(), Some("Alex".to_string()));
+        assert_eq!(cycle.next(), Some("Jane".to_string()));
+        cycle.reverse();
+        assert_eq!(cycle.next(), Some("Alex".to_string()));
+        assert_eq!(cycle.next(), Some("Jojo".to_string()));
+    }
+}
