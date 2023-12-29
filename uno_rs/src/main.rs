@@ -1,83 +1,39 @@
 #![warn(clippy::all)]
 #![warn(clippy::pedantic)]
 #![allow(clippy::must_use_candidate)]
-use crate::state::Deck;
+use crate::state::{Deck, DiscardPile, PlayerCycle};
 
 pub mod state;
 
 pub fn main() {
-    let deck = Deck::new();
-    let player_names = vec!["Jane", "Walther", "Jojo"];
-    let last_index = player_names.len() - 1;
+    let (mut deck, mut pile) = (Deck::new(), DiscardPile::new());
+    let player_names = vec!["Jane", "Walther", "Jojo"]
+        .iter()
+        .map(std::string::ToString::to_string)
+        .collect();
+    let mut player_cycle = PlayerCycle::new(player_names);
 
-    println!("{}", player_names[last_index]);
-
-    let mut i = 0;
+    let mut round = 1;
+    // TODO: need to interact with the pile here
+    let card = deck.draw();
     loop {
-        println!("Hi");
-        i += 1;
-        if i > 5 {
+        println!("Round {round}");
+        let up = player_cycle
+            .next()
+            .expect("Infinite Iterator will always be Some");
+        println!("Player: {up}");
+
+        if round == 7 {
+            player_cycle.reverse();
+        }
+        if round == 10 {
             break;
         }
-    }
-}
-
-// This is supid. There probably is a better way in Rust but I don't have internet atm
-pub struct PlayerCycle {
-    items: Vec<String>,
-    last_index: usize,
-    pos: Option<usize>,
-    direction: isize,
-}
-
-impl PlayerCycle {
-    pub fn new(names: Vec<String>) -> PlayerCycle {
-        PlayerCycle {
-            last_index: &names.len() - 1,
-            items: names,
-            pos: None,
-            direction: 1,
-        }
-    }
-    pub fn reverse(&mut self) {
-        self.direction *= -1;
-    }
-}
-
-impl Iterator for PlayerCycle {
-    type Item = String;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        let len = self.items.len() as isize;
-        // Initialize or update the position
-        self.pos = Some(match self.pos {
-            // rem_euclid is basically modulo but always returning positive numbers
-            Some(pos) => (pos as isize + self.direction).rem_euclid(len) as usize,
-            None => 0, // Default to the start if it's the first call
-        });
-        Some(self.items[self.pos.expect("Shouldn't be None at this point")].clone())
+        round += 1;
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    // TODO: Try out property based testing in Rust (akin to hypothesis in Python)
-    fn test_player_cycle_works() {
-        let names: Vec<String> = vec!["Jane", "Walther", "Jojo", "Alex"]
-            .iter()
-            .map(std::string::ToString::to_string)
-            .collect();
-        let mut cycle = PlayerCycle::new(names);
-        assert_eq!(cycle.next(), Some("Jane".to_string()));
-        assert_eq!(cycle.next(), Some("Walther".to_string()));
-        assert_eq!(cycle.next(), Some("Jojo".to_string()));
-        assert_eq!(cycle.next(), Some("Alex".to_string()));
-        assert_eq!(cycle.next(), Some("Jane".to_string()));
-        cycle.reverse();
-        assert_eq!(cycle.next(), Some("Alex".to_string()));
-        assert_eq!(cycle.next(), Some("Jojo".to_string()));
-    }
 }
