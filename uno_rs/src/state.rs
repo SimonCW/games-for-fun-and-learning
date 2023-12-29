@@ -39,6 +39,7 @@ pub enum Card {
 
 #[derive(Debug)]
 pub struct Deck {
+    // TODO: Do I need to push/pop from both sides? Maybe this should be a VecDeque
     cards: Vec<Card>,
 }
 
@@ -70,10 +71,62 @@ impl Deck {
         cards.shuffle(&mut rng);
         Deck { cards }
     }
+    pub fn draw(&mut self) -> Option<Card> {
+        self.cards.pop()
+    }
 }
+
 impl Default for Deck {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+#[derive(Debug, Default)]
+pub struct DiscardPile {
+    cards: Vec<Card>,
+}
+
+impl DiscardPile {
+    pub fn new() -> DiscardPile {
+        DiscardPile { cards: Vec::new() }
+    }
+}
+
+// This is supid. There probably is a better way in Rust but I don't have internet atm
+pub struct PlayerCycle {
+    items: Vec<String>,
+    last_index: usize,
+    pos: Option<usize>,
+    direction: isize,
+}
+
+impl PlayerCycle {
+    pub fn new(names: Vec<String>) -> PlayerCycle {
+        PlayerCycle {
+            last_index: &names.len() - 1,
+            items: names,
+            pos: None,
+            direction: 1,
+        }
+    }
+    pub fn reverse(&mut self) {
+        self.direction *= -1;
+    }
+}
+
+impl Iterator for PlayerCycle {
+    type Item = String;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let len = self.items.len() as isize;
+        // Initialize or update the position
+        self.pos = Some(match self.pos {
+            // rem_euclid is basically modulo but always returning positive numbers
+            Some(pos) => (pos as isize + self.direction).rem_euclid(len) as usize,
+            None => 0, // Default to the start if it's the first call
+        });
+        Some(self.items[self.pos.expect("Shouldn't be None at this point")].clone())
     }
 }
 
@@ -85,5 +138,23 @@ mod tests {
     fn test_new_deck_has_108_cards() {
         let deck = Deck::new();
         assert_eq!(deck.cards.len(), 108);
+    }
+
+    #[test]
+    // TODO: Try out property based testing in Rust (akin to hypothesis in Python)
+    fn test_player_cycle_works() {
+        let names: Vec<String> = vec!["Jane", "Walther", "Jojo", "Alex"]
+            .iter()
+            .map(std::string::ToString::to_string)
+            .collect();
+        let mut cycle = PlayerCycle::new(names);
+        assert_eq!(cycle.next(), Some("Jane".to_string()));
+        assert_eq!(cycle.next(), Some("Walther".to_string()));
+        assert_eq!(cycle.next(), Some("Jojo".to_string()));
+        assert_eq!(cycle.next(), Some("Alex".to_string()));
+        assert_eq!(cycle.next(), Some("Jane".to_string()));
+        cycle.reverse();
+        assert_eq!(cycle.next(), Some("Alex".to_string()));
+        assert_eq!(cycle.next(), Some("Jojo".to_string()));
     }
 }

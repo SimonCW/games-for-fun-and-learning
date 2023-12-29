@@ -64,6 +64,7 @@ mod tests {
     use super::*;
 
     #[test]
+    // TODO: Try out property based testing in Rust (akin to hypothesis in Python)
     fn test_player_cycle_works() {
         let names: Vec<String> = vec!["Jane", "Walther", "Jojo", "Alex"]
             .iter()
