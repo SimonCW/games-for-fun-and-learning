@@ -3,8 +3,8 @@ use crate::cards::Card;
 // TODO: Do I want clone?
 #[derive(Debug, Clone)]
 pub struct Player {
-    name: String,
-    hand: Vec<Card>,
+    pub name: String,
+    pub hand: Vec<Card>,
 }
 
 #[derive(Debug, Clone)]
@@ -41,6 +41,7 @@ impl Iterator for PlayerCycle {
             Some(pos) => (pos as isize + self.direction).rem_euclid(len) as usize,
             None => 0, // Default to the start if it's the first call
         });
+        todo!();
         Some(self.items[self.pos.expect("Shouldn't be None at this point")])
     }
 }

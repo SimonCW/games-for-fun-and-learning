@@ -8,12 +8,20 @@ pub mod cards;
 pub mod state;
 
 pub fn main() {
+    // Game Setup
     let mut ccards = CommunityCards::new();
-    let player_names = vec!["Jane", "Walther", "Jojo"]
+    let player_names: Vec<String> = vec!["Jane", "Walther", "Jojo"]
         .iter()
         .map(std::string::ToString::to_string)
         .collect();
-    let mut player_cycle = PlayerCycle::new(player_names);
+    let mut players: Vec<Player> = vec![];
+    for player in player_names {
+        players.push(Player {
+            name: player,
+            hand: ccards.draw(7),
+        })
+    }
+    let mut player_cycle = PlayerCycle::new(players);
 
     let mut round = 1;
     // TODO: need to interact with the pile here
