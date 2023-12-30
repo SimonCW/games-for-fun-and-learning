@@ -109,7 +109,12 @@ mod tests {
     fn test_drawing_last_card_reshuffles_pile() {
         let mut ccards = CommunityCards::new();
         ccards.pile = ccards.deck.drain(1..).collect();
-        println!("{:?}", ccards.deck);
-        println!("{:?}", ccards.pile);
+        todo!();
+        println!("Deck before {:?}", ccards.deck);
+        println!("Pile before {:?}", ccards.pile);
+        ccards.draw(3);
+        println!("---Drawing__");
+        println!("Pile after {:?}", ccards.pile);
+        println!("Deck after {:?}", ccards.deck);
     }
 }
