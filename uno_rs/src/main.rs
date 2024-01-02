@@ -2,7 +2,8 @@
 #![warn(clippy::pedantic)]
 #![allow(clippy::must_use_candidate)]
 use crate::cards::{Card, CommunityCards};
-use crate::state::{Player, PlayerCycle};
+use crate::state::{Player, PlayerNameCycle};
+use std::collections::HashMap;
 
 pub mod cards;
 pub mod state;
@@ -14,14 +15,17 @@ pub fn main() {
         .iter()
         .map(std::string::ToString::to_string)
         .collect();
-    let mut players: Vec<Player> = vec![];
-    for player in player_names {
-        players.push(Player {
-            name: player,
-            hand: ccards.draw(7),
-        })
+    let mut player_cycle = PlayerNameCycle::new(player_names.clone());
+    let mut players: HashMap<String, Player> = HashMap::new();
+    for name in player_names {
+        players.insert(
+            name.clone(),
+            Player {
+                name,
+                hand: ccards.draw(7),
+            },
+        );
     }
-    let mut player_cycle = PlayerCycle::new(players);
 
     let mut round = 1;
     // TODO: need to interact with the pile here
@@ -43,7 +47,7 @@ pub fn main() {
     }
 }
 
-fn play_turn(up: Player, top_card: Card, deck: &mut CommunityCards) -> Card {
+fn play_turn(up: String, top_card: Card, deck: &mut CommunityCards) -> Card {
     todo!()
 }
 /*
