@@ -85,7 +85,7 @@ impl CommunityCards {
     pub fn reshuffle_pile_as_deck(&mut self) {
         let mut rng = thread_rng();
         self.pile.shuffle(&mut rng);
-        self.deck = self.pile.drain(..).collect();
+        self.deck.extend(self.pile.drain(..).collect::<Vec<_>>());
     }
 }
 
@@ -108,13 +108,17 @@ mod tests {
     #[test]
     fn test_drawing_last_card_reshuffles_pile() {
         let mut ccards = CommunityCards::new();
+        let n_cards = ccards.deck.len();
+        assert!(ccards.deck.len() > ccards.pile.len());
         ccards.pile = ccards.deck.drain(1..).collect();
-        todo!();
-        println!("Deck before {:?}", ccards.deck);
-        println!("Pile before {:?}", ccards.pile);
-        ccards.draw(3);
-        println!("---Drawing__");
-        println!("Pile after {:?}", ccards.pile);
-        println!("Deck after {:?}", ccards.deck);
+        assert!(ccards.deck.len() < ccards.pile.len());
+        let drawn = ccards.draw(2); // This triggers a reshuffle of the pile of cards into the deck
+        assert!(ccards.deck.len() > ccards.pile.len());
+        // Sanity check that all cards are there
+        assert_eq!(
+            drawn.len() + ccards.deck.len() + ccards.pile.len(),
+            n_cards,
+            "All cards should be accounted for"
+        );
     }
 }
