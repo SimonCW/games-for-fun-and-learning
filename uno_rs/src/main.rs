@@ -28,14 +28,17 @@ pub fn main() {
     }
 
     let mut round = 1;
-    // TODO: need to interact with the pile here
-    let top_card = ccards.draw(1);
+    let top_card = ccards.draw(1).pop().unwrap();
+    ccards.add_to_top_of_pile(top_card);
     loop {
         println!("Round {round}");
-        let up = player_cycle
-            .next()
-            .expect("Infinite Iterator will always be Some");
-        println!("Player: {up:#?}");
+        let up = players
+            .get_mut(
+                &player_cycle
+                    .next()
+                    .expect("Infinite Iterator will always be Some"),
+            )
+            .expect("Must be present or game setup is broken");
 
         if round == 7 {
             player_cycle.reverse();
