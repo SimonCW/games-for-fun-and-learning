@@ -75,7 +75,6 @@ impl CommunityCards {
             pile: Vec::new(),
         }
     }
-
     /// Draw n cards from the deck. If there are not enough cards left in the deck, the pile is reshuffled into the deck.
     pub fn draw(&mut self, n: usize) -> Vec<Card> {
         // This is not how one would usually do it in real life. There you'd deal the remaining
@@ -90,6 +89,12 @@ impl CommunityCards {
         let mut rng = thread_rng();
         self.pile.shuffle(&mut rng);
         self.deck.extend(self.pile.drain(..).collect::<Vec<_>>());
+    }
+    pub fn add_to_top_of_pile(&mut self, card: Card) {
+        self.pile.push(card);
+    }
+    pub fn top_of_pile(&self) -> Option<&Card> {
+        self.pile.last()
     }
 }
 
