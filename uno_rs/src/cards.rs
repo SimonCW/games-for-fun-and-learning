@@ -76,7 +76,11 @@ impl CommunityCards {
         }
     }
 
+    /// Draw n cards from the deck. If there are not enough cards left in the deck, the pile is reshuffled into the deck.
     pub fn draw(&mut self, n: usize) -> Vec<Card> {
+        // This is not how one would usually do it in real life. There you'd deal the remaining
+        // cards from the deck and only then reshuffle. My implementation just shuffles the
+        // remaining cards together with the pile and then draws from the top.
         if self.deck.len() < n {
             self.reshuffle_pile_as_deck();
         }
