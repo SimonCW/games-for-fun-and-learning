@@ -3,7 +3,6 @@
 #![allow(clippy::must_use_candidate)]
 use crate::cards::{Card, ColoredCard, CommunityCards};
 use crate::player::{Player, Players};
-use std::collections::HashMap;
 
 pub mod cards;
 pub mod player;
@@ -42,7 +41,7 @@ pub fn main() {
         }
 
         if round == 7 {
-            player_cycle.reverse();
+            players.reverse();
         }
         if round == 10 {
             break;

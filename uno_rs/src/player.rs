@@ -16,7 +16,7 @@ pub struct Players {
 
 impl Players {
     pub fn new(players: Vec<Player>) -> Players {
-        let mut name_cycle = PlayerNameCycle::new(players.iter().map(|p| p.name.clone()).collect());
+        let name_cycle = PlayerNameCycle::new(players.iter().map(|p| p.name.clone()).collect());
         let mut map: HashMap<String, Player> = HashMap::new();
         for player in players {
             map.insert(player.name.clone(), player);
@@ -41,21 +41,21 @@ impl Players {
 
 #[derive(Debug, Clone)]
 // This is supid. There probably is a better way in Rust but I don't have internet atm
-pub struct PlayerNameCycle {
+struct PlayerNameCycle {
     items: Vec<String>,
     pos: Option<usize>,
     direction: isize,
 }
 
 impl PlayerNameCycle {
-    pub fn new(player_names: Vec<String>) -> PlayerNameCycle {
+    fn new(player_names: Vec<String>) -> PlayerNameCycle {
         PlayerNameCycle {
             items: player_names,
             pos: None,
             direction: 1,
         }
     }
-    pub fn reverse(&mut self) {
+    fn reverse(&mut self) {
         self.direction *= -1;
     }
 }
