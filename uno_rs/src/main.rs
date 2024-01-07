@@ -39,6 +39,27 @@ pub fn main() {
                     .expect("Infinite Iterator will always be Some"),
             )
             .expect("Must be present or game setup is broken");
+        let top_card = ccards
+            .top_of_pile()
+            .expect("There should be a top card at this point");
+        println!("Top card: {top_card:?}");
+        match top_card {
+            Card::Colored(_, ColoredCard::Skip) => {
+                println!("Skipping player");
+                let up = players
+                    .get_mut(
+                        &player_cycle
+                            .next()
+                            .expect("Infinite Iterator will always be Some"),
+                    )
+                    .expect("Must be present or game setup is broken");
+            }
+            Card::Colored(_, ColoredCard::Reverse) => {}
+            Card::Colored(_, ColoredCard::DrawTwo) => {}
+            Card::WildWishColor => {}
+            Card::WildWishColorDrawFour => {}
+            Card::Colored(..) => {}
+        }
 
         if round == 7 {
             player_cycle.reverse();
@@ -50,9 +71,40 @@ pub fn main() {
     }
 }
 
-fn play_turn(up: String, top_card: Card, deck: &mut CommunityCards) -> Card {
-    todo!()
+pub enum Action {
+    Skip,
+    Reverse,
+    Draw(usize),
+    NewColor,
+    NewColorDraw(usize),
+    None,
 }
+
+fn determine_action(card: &Card) -> Action {}
+
+// fn play_turn(up: &mut Player, ccards: &mut CommunityCards) {
+//     let top_card = ccards
+//         .top_of_pile()
+//         .expect("There should be a top card at this point");
+//     match top_card {
+//         Card::Colored(_, ColoredCard::Skip) => {
+//         todo!()
+//     }
+//
+//         Card::Colored(_, ColoredCard::Reverse) => {
+//         todo!()
+//     }
+//         _ => {
+//             // do nothing
+//             todo!()
+//         }
+//
+// }
+// //
+// fn do_card_action(card: Card) {
+//     todo!()
+// }
+
 /*
 // Trying to implement the game logic in a more functional style. This would allow to test scenarios more
 // easily, i.e., have one function that takes necessary inputs. But should it be a pure func and just return
