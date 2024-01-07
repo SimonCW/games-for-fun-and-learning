@@ -1,12 +1,12 @@
 #![warn(clippy::all)]
 #![warn(clippy::pedantic)]
 #![allow(clippy::must_use_candidate)]
-use crate::cards::{Card, CommunityCards};
-use crate::state::{Player, PlayerNameCycle};
+use crate::cards::{Card, ColoredCard, CommunityCards};
+use crate::player::{Player, PlayerNameCycle};
 use std::collections::HashMap;
 
 pub mod cards;
-pub mod state;
+pub mod player;
 
 pub fn main() {
     // Game Setup
