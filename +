@@ -11,31 +11,37 @@ pub struct Player {
 
 pub struct Players {
     name_cycle: PlayerNameCycle,
-    map: HashMap<String, Player>,
+    players_map: HashMap<String, Player>,
 }
 
 impl Players {
-    pub fn new(players: Vec<Player>) -> Players {
-        let mut name_cycle = PlayerNameCycle::new(players.iter().map(|p| p.name.clone()).collect());
-        let mut map: HashMap<String, Player> = HashMap::new();
-        for player in players {
-            map.insert(player.name.clone(), player);
+    pub fn new(players: Vec<String>) -> Players {
+        let mut player_cycle = PlayerNameCycle::new(player_names);
+        let mut players: HashMap<String, Player> = HashMap::new();
+        for name in player_names {
+            players.insert(
+                name.clone(),
+                Player {
+                    name,
+                    hand: ccards.draw(7),
+                },
+            );
         }
-        Players { name_cycle, map }
-    }
-    pub fn reverse(&mut self) {
-        self.name_cycle.reverse();
-    }
-    pub fn next_player(&mut self) -> &mut Player {
-        // I first tried to use the iterator here but it didn't work out because it would have
-        // needed unsafe code to get the mutable reference out of the iterator
-        let name = self
-            .name_cycle
-            .next()
-            .expect("Infinite Iterator will always be Some");
-        self.map
-            .get_mut(&name)
-            .expect("Must be present or new() is broken")
+
+        let mut players_map = HashMap::new();
+        for name in player_names.clone() {
+            players_map.insert(
+                name.clone(),
+                Player {
+                    name,
+                    hand: Vec::new(),
+                },
+            );
+        }
+        Players {
+            name_cycle: PlayerNameCycle::new(player_names),
+            players_map,
+        }
     }
 }
 
