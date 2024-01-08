@@ -23,21 +23,43 @@ pub fn main() {
     ccards.add_to_top_of_pile(top_card);
     loop {
         println!("Round {round}");
-        let up = players.next_player();
         let top_card = ccards
             .top_of_pile()
             .expect("There should be a top card at this point");
         println!("Top card: {top_card:?}");
         match top_card {
+            // TODO: Return "up" from the match statement?
             Card::Colored(_, ColoredCard::Skip) => {
-                println!("Skipping player {}", up.name);
+                let skipped = players.next_player();
+                println!("Skipping player {}", skipped.name);
                 let up = players.next_player();
+                // let up play
             }
-            Card::Colored(_, ColoredCard::Reverse) => {}
-            Card::Colored(_, ColoredCard::DrawTwo) => {}
-            Card::WildWishColor => {}
-            Card::WildWishColorDrawFour => {}
-            Card::Colored(..) => {}
+            Card::Colored(_, ColoredCard::Reverse) => {
+                players.reverse();
+                println!("Reversing play direction");
+                let up = players.next_player();
+                // let up play
+            }
+            Card::Colored(_, ColoredCard::DrawTwo) => {
+                let up = players.next_player();
+                // up.hand.extend( ... ccards.draw(2);
+                // let up play
+            }
+            Card::WildWishColor => {
+                // random chose a color
+                // But how to signal that "up" can only play this color? Maybe a boolean
+                // "need_to_respect_wish_color"
+                // let up play
+            }
+            Card::WildWishColorDrawFour => {
+                // up.hand.extend() ...
+                // random chose color
+                // let up play
+            }
+            Card::Colored(..) => {
+                // let up play
+            }
         }
 
         if round == 7 {
