@@ -22,45 +22,50 @@ pub fn main() {
     let top_card = ccards.draw(1).pop().unwrap();
     ccards.add_to_top_of_pile(top_card);
     loop {
+        if round != 1 {
+            let top_card = ccards.draw(1).pop().unwrap();
+            ccards.add_to_top_of_pile(top_card);
+        }
         println!("Round {round}");
         let top_card = ccards
             .top_of_pile()
             .expect("There should be a top card at this point");
         println!("Top card: {top_card:?}");
-        match top_card {
-            // TODO: Return "up" from the match statement?
-            Card::Colored(_, ColoredCard::Skip) => {
-                let skipped = players.next_player();
-                println!("Skipping player {}", skipped.name);
-                let up = players.next_player();
-                // let up play
-            }
-            Card::Colored(_, ColoredCard::Reverse) => {
-                players.reverse();
-                println!("Reversing play direction");
-                let up = players.next_player();
-                // let up play
-            }
-            Card::Colored(_, ColoredCard::DrawTwo) => {
-                let up = players.next_player();
-                // up.hand.extend( ... ccards.draw(2);
-                // let up play
-            }
-            Card::WildWishColor => {
-                // random chose a color
-                // But how to signal that "up" can only play this color? Maybe a boolean
-                // "need_to_respect_wish_color"
-                // let up play
-            }
-            Card::WildWishColorDrawFour => {
-                // up.hand.extend() ...
-                // random chose color
-                // let up play
-            }
-            Card::Colored(..) => {
-                // let up play
-            }
-        }
+        let up = whos_up(&top_card, &mut players);
+        // match top_card {
+        //     // TODO: Return "up" from the match statement?
+        //     Card::Colored(_, ColoredCard::Skip) => {
+        //         let skipped = players.next_player();
+        //         println!("Skipping player {}", skipped.name);
+        //         let up = players.next_player();
+        //         // let up play
+        //     }
+        //     Card::Colored(_, ColoredCard::Reverse) => {
+        //         players.reverse();
+        //         println!("Reversing play direction");
+        //         let up = players.next_player();
+        //         // let up play
+        //     }
+        //     Card::Colored(_, ColoredCard::DrawTwo) => {
+        //         let up = players.next_player();
+        //         // up.hand.extend( ... ccards.draw(2);
+        //         // let up play
+        //     }
+        //     Card::WildWishColor => {
+        //         // random chose a color
+        //         // But how to signal that "up" can only play this color? Maybe a boolean
+        //         // "need_to_respect_wish_color"
+        //         // let up play
+        //     }
+        //     Card::WildWishColorDrawFour => {
+        //         // up.hand.extend() ...
+        //         // random chose color
+        //         // let up play
+        //     }
+        //     Card::Colored(..) => {
+        //         // let up play
+        //     }
+        // }
 
         if round == 7 {
             players.reverse();
@@ -69,6 +74,28 @@ pub fn main() {
             break;
         }
         round += 1;
+    }
+}
+fn whos_up<'a>(top_card: &Card, players: &'a mut Players) -> &'a mut Player {
+    match top_card {
+        // TODO: Return "up" from the match statement?
+        Card::Colored(_, ColoredCard::Skip) => {
+            let skipped_name = players.next_player().name.clone();
+            let up = players.next_player();
+            println!("Skipping player {}, it's {}'s turn", skipped_name, up.name);
+            up
+        }
+        Card::Colored(_, ColoredCard::Reverse) => {
+            players.reverse();
+            let up = players.next_player();
+            println!("Reversing play direction, it's {}'s turn", up.name);
+            up
+        }
+        _ => {
+            let up = players.next_player();
+            println!("It's {}'s turn", up.name);
+            up
+        }
     }
 }
 // fn play_turn(up: &mut Player, ccards: &mut CommunityCards) {
@@ -116,4 +143,9 @@ fn play_turn(up: Player, top_card: Card, deck: &mut Deck) -> Card {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_whos_up() {
+        todo!()
+    }
 }
