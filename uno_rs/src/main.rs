@@ -16,7 +16,7 @@ pub fn main() {
     let player_list: Vec<Player> = ["Jane", "Walther", "Jojo"]
         .iter()
         .map(|name| Player {
-            name: name.to_string(),
+            name: (*name).to_string(),
             hand: ccards.draw(7),
         })
         .collect();
@@ -34,41 +34,31 @@ pub fn main() {
             .top_of_pile()
             .expect("There should be a top card at this point");
         println!("Top card: {top_card:?}");
-        let up = whos_up(&top_card, &mut players);
-        // match top_card {
-        //     // TODO: Return "up" from the match statement?
-        //     Card::Colored(_, ColoredCard::Skip) => {
-        //         let skipped = players.next_player();
-        //         println!("Skipping player {}", skipped.name);
-        //         let up = players.next_player();
-        //         // let up play
-        //     }
-        //     Card::Colored(_, ColoredCard::Reverse) => {
-        //         players.reverse();
-        //         println!("Reversing play direction");
-        //         let up = players.next_player();
-        //         // let up play
-        //     }
-        //     Card::Colored(_, ColoredCard::DrawTwo) => {
-        //         let up = players.next_player();
-        //         // up.hand.extend( ... ccards.draw(2);
-        //         // let up play
-        //     }
-        //     Card::WildWishColor => {
-        //         // random chose a color
-        //         // But how to signal that "up" can only play this color? Maybe a boolean
-        //         // "need_to_respect_wish_color"
-        //         // let up play
-        //     }
-        //     Card::WildWishColorDrawFour => {
-        //         // up.hand.extend() ...
-        //         // random chose color
-        //         // let up play
-        //     }
-        //     Card::Colored(..) => {
-        //         // let up play
-        //     }
-        // }
+        let up = whose_turn(top_card, &mut players);
+        match top_card {
+            Card::Colored(_, ColoredCard::DrawTwo) => {
+                todo!()
+                // up.hand.extend( ... ccards.draw(2);
+                // let up play
+            }
+            Card::WildWishColor => {
+                todo!()
+                // random chose a color
+                // But how to signal that "up" can only play this color? Maybe a boolean
+                // "need_to_respect_wish_color"
+                // let up play
+            }
+            Card::WildWishColorDrawFour => {
+                todo!()
+                // up.hand.extend() ...
+                // random chose color
+                // let up play
+            }
+            Card::Colored(..) => {
+                todo!()
+                // let up play
+            }
+        }
 
         if round == 7 {
             players.reverse();
@@ -79,8 +69,9 @@ pub fn main() {
         round += 1;
     }
 }
-fn whos_up<'a>(top_card: &Card, players: &'a mut Players) -> &'a mut Player {
-    match top_card {
+
+fn whose_turn<'a>(top_card: &Card, players: &'a mut Players) -> &'a mut Player {
+    match &top_card {
         // TODO: Return "up" from the match statement?
         Card::Colored(_, ColoredCard::Skip) => {
             let skipped_name = players.next_player().name.clone();
@@ -101,28 +92,6 @@ fn whos_up<'a>(top_card: &Card, players: &'a mut Players) -> &'a mut Player {
         }
     }
 }
-// fn play_turn(up: &mut Player, ccards: &mut CommunityCards) {
-//     let top_card = ccards
-//         .top_of_pile()
-//         .expect("There should be a top card at this point");
-//     match top_card {
-//         Card::Colored(_, ColoredCard::Skip) => {
-//         todo!()
-//     }
-//
-//         Card::Colored(_, ColoredCard::Reverse) => {
-//         todo!()
-//     }
-//         _ => {
-//             // do nothing
-//             todo!()
-//         }
-//
-// }
-// //
-// fn do_card_action(card: Card) {
-//     todo!()
-// }
 
 /*
 // Trying to implement the game logic in a more functional style. This would allow to test scenarios more
@@ -146,9 +115,44 @@ fn play_turn(up: Player, top_card: Card, deck: &mut Deck) -> Card {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::cards::{Card, Color, ColoredCard, CommunityCards};
 
     #[test]
-    fn test_whos_up() {
-        todo!()
+    fn test_should_skip() {
+        let mut players = create_players();
+        let top_card = Card::Colored(Color::Yellow, ColoredCard::Skip);
+        let up = whose_turn(&top_card, &mut players);
+        assert_eq!(up.name, "Walther".to_string());
+    }
+
+    #[test]
+    fn test_should_reverse() {
+        let mut players = create_players();
+        let top_card = Card::Colored(Color::Yellow, ColoredCard::DrawTwo);
+        let up = whose_turn(&top_card, &mut players);
+        assert_eq!(up.name, "Jane".to_string());
+        let top_card = Card::Colored(Color::Yellow, ColoredCard::Reverse);
+        let up = whose_turn(&top_card, &mut players);
+        assert_eq!(up.name, "Alex".to_string());
+    }
+
+    #[test]
+    fn test_should_reverse_on_first_player() {
+        let mut players = create_players();
+        let top_card = Card::Colored(Color::Yellow, ColoredCard::Reverse);
+        let up = whose_turn(&top_card, &mut players);
+        assert_eq!(up.name, "Alex".to_string());
+    }
+
+    fn create_players() -> Players {
+        let mut ccards = CommunityCards::new();
+        let player_list: Vec<Player> = ["Jane", "Walther", "Jojo", "Alex"]
+            .iter()
+            .map(|name| Player {
+                name: (*name).to_string(),
+                hand: ccards.draw(7),
+            })
+            .collect();
+        Players::new(player_list)
     }
 }
