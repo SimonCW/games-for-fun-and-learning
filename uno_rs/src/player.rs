@@ -69,6 +69,8 @@ impl Iterator for PlayerNameCycle {
         self.pos = Some(match self.pos {
             // rem_euclid is basically modulo but always returning positive numbers
             Some(pos) => (pos as isize + self.direction).rem_euclid(len) as usize,
+            None if self.direction == -1 => (len - 1).try_into().unwrap(), // Default to the end if it's the first call and
+            // reversed
             None => 0, // Default to the start if it's the first call
         });
         Some(self.items[self.pos.expect("Shouldn't be None at this point")].clone())
@@ -78,21 +80,66 @@ impl Iterator for PlayerNameCycle {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::cards::CommunityCards;
+
     #[test]
-    // TODO: Try out property based testing in Rust (akin to hypothesis in Python)
-    fn test_player_cycle_works() {
-        let names: Vec<String> = vec!["Jane", "Walther", "Jojo", "Alex"]
-            .iter()
-            .map(std::string::ToString::to_string)
-            .collect();
-        let mut cycle = PlayerNameCycle::new(names);
+    fn test_player_cycle_should_wrap_around() {
+        let mut players = create_players();
+        assert_eq!(players.next_player().name, "Jane".to_string());
+        assert_eq!(players.next_player().name, "Walther".to_string());
+        assert_eq!(players.next_player().name, "Jojo".to_string());
+        assert_eq!(players.next_player().name, "Alex".to_string());
+        assert_eq!(players.next_player().name, "Jane".to_string());
+    }
+
+    #[test]
+    fn test_player_cycle_reverse() {
+        let mut players = create_players();
+        assert_eq!(players.next_player().name, "Jane".to_string());
+        assert_eq!(players.next_player().name, "Walther".to_string());
+        players.reverse();
+        assert_eq!(players.next_player().name, "Jane".to_string());
+        assert_eq!(players.next_player().name, "Alex".to_string());
+    }
+
+    #[test]
+    fn test_player_name_cycle_should_wrap_around() {
+        let mut cycle = create_player_name_cycle();
         assert_eq!(cycle.next(), Some("Jane".to_string()));
         assert_eq!(cycle.next(), Some("Walther".to_string()));
         assert_eq!(cycle.next(), Some("Jojo".to_string()));
         assert_eq!(cycle.next(), Some("Alex".to_string()));
         assert_eq!(cycle.next(), Some("Jane".to_string()));
+    }
+
+    #[test]
+    fn test_player_name_cycle_reverse() {
+        let mut cycle = create_player_name_cycle();
+        assert_eq!(cycle.next(), Some("Jane".to_string()));
+        assert_eq!(cycle.next(), Some("Walther".to_string()));
         cycle.reverse();
+        assert_eq!(cycle.next(), Some("Jane".to_string()));
         assert_eq!(cycle.next(), Some("Alex".to_string()));
-        assert_eq!(cycle.next(), Some("Jojo".to_string()));
+    }
+
+    fn create_players() -> Players {
+        let mut ccards = CommunityCards::new();
+        let player_list: Vec<Player> = ["Jane", "Walther", "Jojo", "Alex"]
+            .iter()
+            .map(|name| Player {
+                name: (*name).to_string(),
+                hand: ccards.draw(7),
+            })
+            .collect();
+        Players::new(player_list)
+    }
+
+    fn create_player_name_cycle() -> PlayerNameCycle {
+        // TODO: Try out property based testing in Rust (akin to hypothesis in Python)
+        let names: Vec<String> = ["Jane", "Walther", "Jojo", "Alex"]
+            .iter()
+            .map(std::string::ToString::to_string)
+            .collect();
+        PlayerNameCycle::new(names)
     }
 }
