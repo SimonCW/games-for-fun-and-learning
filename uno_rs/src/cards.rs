@@ -7,15 +7,10 @@ const COLOR_SPECIALS: [ColoredCard; 3] = [
     ColoredCard::Reverse,
     ColoredCard::DrawTwo,
 ];
-const COLORS: [CardColor; 4] = [
-    CardColor::Blue,
-    CardColor::Green,
-    CardColor::Red,
-    CardColor::Yellow,
-];
+const COLORS: [Color; 4] = [Color::Blue, Color::Green, Color::Red, Color::Yellow];
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum CardColor {
+pub enum Color {
     Blue,
     Green,
     Red,
@@ -32,7 +27,7 @@ pub enum ColoredCard {
 
 #[derive(Debug, Clone)]
 pub enum Card {
-    Colored(CardColor, ColoredCard),
+    Colored(Color, ColoredCard),
     WildWishColor,
     WildWishColorDrawFour,
 }
