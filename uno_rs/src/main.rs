@@ -1,6 +1,9 @@
 #![warn(clippy::all)]
 #![warn(clippy::pedantic)]
+#![warn(clippy::style)]
 #![allow(clippy::must_use_candidate)]
+#![allow(unused_variables)]
+#![allow(clippy::missing_panics_doc)]
 use crate::cards::{Card, ColoredCard, CommunityCards};
 use crate::player::{Player, Players};
 
