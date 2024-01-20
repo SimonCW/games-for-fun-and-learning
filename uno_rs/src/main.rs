@@ -4,8 +4,10 @@
 #![allow(clippy::must_use_candidate)]
 #![allow(unused_variables)]
 #![allow(clippy::missing_panics_doc)]
-use crate::cards::{Card, ColoredCard, CommunityCards};
+use crate::cards::{Card, Color, ColoredCard, CommunityCards};
 use crate::player::{Player, Players};
+use rand::seq::SliceRandom;
+use rand::thread_rng;
 
 pub mod cards;
 pub mod player;
@@ -35,31 +37,6 @@ pub fn main() {
             .expect("There should be a top card at this point");
         println!("Top card: {top_card:?}");
         let up = whose_turn(top_card, &mut players);
-        match top_card {
-            Card::Colored(_, ColoredCard::DrawTwo) => {
-                todo!()
-                // up.hand.extend( ... ccards.draw(2);
-                // let up play
-            }
-            Card::WildWishColor => {
-                todo!()
-                // random chose a color
-                // But how to signal that "up" can only play this color? Maybe a boolean
-                // "need_to_respect_wish_color"
-                // let up play
-            }
-            Card::WildWishColorDrawFour => {
-                todo!()
-                // up.hand.extend() ...
-                // random chose color
-                // let up play
-            }
-            Card::Colored(..) => {
-                todo!()
-                // let up play
-            }
-        }
-
         if round == 7 {
             players.reverse();
         }
@@ -93,29 +70,66 @@ fn whose_turn<'a>(top_card: &Card, players: &'a mut Players) -> &'a mut Player {
     }
 }
 
-/*
+fn random_color() -> Color {
+    let mut rng = thread_rng();
+    cards::COLORS
+        .choose(&mut rng)
+        .expect("Constant shouldn't be empty")
+        .clone()
+}
+
 // Trying to implement the game logic in a more functional style. This would allow to test scenarios more
 // easily, i.e., have one function that takes necessary inputs. But should it be a pure func and just return
 // a new deck? Or should it mutate the deck and return just the topmost card or sth. like this?
 // I'd like to do without mutation but that seems kinda hard with Games where basically the whole
 // thing revolves around one shared mutable state.
 // Still, containing the muatation in one function would be better than having it spread out all over the place.
-fn play_turn(up: Player, top_card: Card, deck: &mut Deck) -> Card {
-    todo!()
-    // 1. Draw cards if "draw 2"
-    // 2. Play card (or draw 1)
-    // 3. Check if player has won
+fn play_turn(up: &mut Player, top_card: Card, ccards: &mut CommunityCards) -> Card {
+    match top_card {
+        Card::Colored(_, ColoredCard::DrawTwo) => {
+            println!("{} draws two cards.", up.name);
+            println!("Cards before drawing {}", up.hand.len());
+            up.hand.extend(ccards.draw(2));
+            println!("Cards after drawing {}", up.hand.len());
+            // up.play(top_card);
+            // Check if player has won
+        }
+        Card::WildWishColor => {
+            let color_wish = random_color();
+            // up.play(top_card);
+            // Check if player has won
+        }
+        Card::WildWishColorDrawFour => {
+            let color_wish = random_color();
+            up.hand.extend(ccards.draw(4));
+            // up.play(top_card);
+            // Check if player has won
+        }
+        Card::Colored(..) => println!("No action to take"),
+    }
 }
 // Do card action (if any), e.g. skip, reverse, draw cards, new color
 // Next player (depending on skip and reverse)
 // play_turn()
 //
-*/
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::cards::{Card, Color, ColoredCard, CommunityCards};
+
+    // TODO: Is there something like pytest.fixture with yield to run setup and teardown only once?
+    fn create_players() -> Players {
+        let mut ccards = CommunityCards::new();
+        let player_list: Vec<Player> = ["Jane", "Walther", "Jojo", "Alex"]
+            .iter()
+            .map(|name| Player {
+                name: (*name).to_string(),
+                hand: ccards.draw(7),
+            })
+            .collect();
+        Players::new(player_list)
+    }
 
     #[test]
     fn test_should_skip() {
@@ -144,15 +158,6 @@ mod tests {
         assert_eq!(up.name, "Alex".to_string());
     }
 
-    fn create_players() -> Players {
-        let mut ccards = CommunityCards::new();
-        let player_list: Vec<Player> = ["Jane", "Walther", "Jojo", "Alex"]
-            .iter()
-            .map(|name| Player {
-                name: (*name).to_string(),
-                hand: ccards.draw(7),
-            })
-            .collect();
-        Players::new(player_list)
-    }
+    #[test]
+    fn test_should_extend_hand() {}
 }
