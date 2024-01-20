@@ -47,37 +47,6 @@ pub fn main() {
     }
 }
 
-fn whose_turn<'a>(top_card: &Card, players: &'a mut Players) -> &'a mut Player {
-    match &top_card {
-        // TODO: Return "up" from the match statement?
-        Card::Colored(_, ColoredCard::Skip) => {
-            let skipped_name = players.next_player().name.clone();
-            let up = players.next_player();
-            println!("Skipping player {}, it's {}'s turn", skipped_name, up.name);
-            up
-        }
-        Card::Colored(_, ColoredCard::Reverse) => {
-            players.reverse();
-            let up = players.next_player();
-            println!("Reversing play direction, it's {}'s turn", up.name);
-            up
-        }
-        _ => {
-            let up = players.next_player();
-            println!("It's {}'s turn", up.name);
-            up
-        }
-    }
-}
-
-fn random_color() -> Color {
-    let mut rng = thread_rng();
-    cards::COLORS
-        .choose(&mut rng)
-        .expect("Constant shouldn't be empty")
-        .clone()
-}
-
 // Trying to implement the game logic in a more functional style. This would allow to test scenarios more
 // easily, i.e., have one function that takes necessary inputs. But should it be a pure func and just return
 // a new deck? Or should it mutate the deck and return just the topmost card or sth. like this?
@@ -108,10 +77,37 @@ fn play_turn(up: &mut Player, top_card: Card, ccards: &mut CommunityCards) -> Ca
         Card::Colored(..) => println!("No action to take"),
     }
 }
-// Do card action (if any), e.g. skip, reverse, draw cards, new color
-// Next player (depending on skip and reverse)
-// play_turn()
-//
+
+fn whose_turn<'a>(top_card: &Card, players: &'a mut Players) -> &'a mut Player {
+    match &top_card {
+        // TODO: Return "up" from the match statement?
+        Card::Colored(_, ColoredCard::Skip) => {
+            let skipped_name = players.next_player().name.clone();
+            let up = players.next_player();
+            println!("Skipping player {}, it's {}'s turn", skipped_name, up.name);
+            up
+        }
+        Card::Colored(_, ColoredCard::Reverse) => {
+            players.reverse();
+            let up = players.next_player();
+            println!("Reversing play direction, it's {}'s turn", up.name);
+            up
+        }
+        _ => {
+            let up = players.next_player();
+            println!("It's {}'s turn", up.name);
+            up
+        }
+    }
+}
+
+fn random_color() -> Color {
+    let mut rng = thread_rng();
+    cards::COLORS
+        .choose(&mut rng)
+        .expect("Constant shouldn't be empty")
+        .clone()
+}
 
 #[cfg(test)]
 mod tests {
