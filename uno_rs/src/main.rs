@@ -27,6 +27,11 @@ pub fn main() {
     let top_card = ccards.draw(1).pop().unwrap();
     ccards.add_to_top_of_pile(top_card);
     loop {
+        // TODO: There are 2 bugs
+        // 1. Draw2 := Draw2 + Skip. RTFM dummy!
+        // 2. If player B has to draw 2 and is then skipped, player C will again draw2, ...
+        // Idea: A card creates an Action, e.g. Action::Draw2. This action is appeneded to a queue
+        // and then popped. Hence, every action will only be excecuted once.
         if round != 1 {
             let top_card = ccards.draw(1).pop().unwrap();
             ccards.add_to_top_of_pile(top_card);
