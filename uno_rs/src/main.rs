@@ -42,40 +42,7 @@ pub fn main() {
         // Todo: Seperate Deck and Pile. Lumping together the pile and the deck is biting me here. I cannot borrow mutably
         // here because of `top_of_pile?`. However, I'd just need the deck mutably here, not the
         // pile
-
-        let up = match &top_card {
-            // TODO: Return "up" from the match statement?
-            Card::Colored(_, ColoredCard::Skip) => {
-                let skipped = players.next_player();
-                let up = players.next_player();
-                println!("Skipping player {}", skipped.name);
-                up
-            }
-            Card::Colored(_, ColoredCard::DrawTwo) => {
-                let skipped = players.next_player();
-                skipped.hand.extend(ccards.draw(2));
-                let up = players.next_player();
-                println!("{} draws two cards.", skipped.name);
-                up
-            }
-            Card::WildWishColorDrawFour => {
-                let skipped = players.next_player();
-                skipped.hand.extend(ccards.draw(4));
-                let up = players.next_player();
-                println!("{} draws four cards.", skipped.name);
-                up
-            }
-            Card::Colored(_, ColoredCard::Reverse) => {
-                players.reverse();
-                let up = players.next_player();
-                println!("Reversing play direction");
-                up
-            }
-            _ => {
-                let up = players.next_player();
-                up
-            }
-        };
+        let up = whose_turn(top_card, &mut players, &mut ccards);
 
         println!("It's {}'s turn", up.name);
         if round == 10 {
@@ -83,6 +50,47 @@ pub fn main() {
         }
         round += 1;
     }
+}
+
+fn whose_turn<'a>(
+    top_card: Card,
+    players: &'a mut Players,
+    ccards: &mut CommunityCards,
+) -> &'a mut Player {
+    let up = match &top_card {
+        // TODO: Return "up" from the match statement?
+        Card::Colored(_, ColoredCard::Skip) => {
+            let skipped = players.next_player().name.clone();
+            println!("Skipping player {}", skipped);
+            let up = players.next_player();
+            up
+        }
+        Card::Colored(_, ColoredCard::DrawTwo) => {
+            let skipped = players.next_player();
+            skipped.hand.extend(ccards.draw(2));
+            let up = players.next_player();
+            println!("{} draws two cards.", skipped.name);
+            up
+        }
+        Card::WildWishColorDrawFour => {
+            let skipped = players.next_player();
+            skipped.hand.extend(ccards.draw(4));
+            let up = players.next_player();
+            println!("{} draws four cards.", skipped.name);
+            up
+        }
+        Card::Colored(_, ColoredCard::Reverse) => {
+            players.reverse();
+            let up = players.next_player();
+            println!("Reversing play direction");
+            up
+        }
+        _ => {
+            let up = players.next_player();
+            up
+        }
+    };
+    up
 }
 
 fn random_color() -> Color {
