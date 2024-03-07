@@ -38,90 +38,50 @@ pub fn main() {
             .expect("There should be a top card at this point")
             .to_owned();
         println!("Top card: {top_card:?}");
+
         // Todo: Seperate Deck and Pile. Lumping together the pile and the deck is biting me here. I cannot borrow mutably
         // here because of `top_of_pile?`. However, I'd just need the deck mutably here, not the
         // pile
-        let up = whose_turn(&top_card, &mut ccards, &mut players);
+
+        let up = match &top_card {
+            // TODO: Return "up" from the match statement?
+            Card::Colored(_, ColoredCard::Skip) => {
+                let skipped = players.next_player();
+                let up = players.next_player();
+                println!("Skipping player {}", skipped.name);
+                up
+            }
+            Card::Colored(_, ColoredCard::DrawTwo) => {
+                let skipped = players.next_player();
+                skipped.hand.extend(ccards.draw(2));
+                let up = players.next_player();
+                println!("{} draws two cards.", skipped.name);
+                up
+            }
+            Card::WildWishColorDrawFour => {
+                let skipped = players.next_player();
+                skipped.hand.extend(ccards.draw(4));
+                let up = players.next_player();
+                println!("{} draws four cards.", skipped.name);
+                up
+            }
+            Card::Colored(_, ColoredCard::Reverse) => {
+                players.reverse();
+                let up = players.next_player();
+                println!("Reversing play direction");
+                up
+            }
+            _ => {
+                let up = players.next_player();
+                up
+            }
+        };
+
         println!("It's {}'s turn", up.name);
         if round == 10 {
             break;
         }
         round += 1;
-    }
-}
-
-// Trying to implement the game logic in a more functional style. This would allow to test scenarios more
-// easily, i.e., have one function that takes necessary inputs. But should it be a pure func and just return
-// a new deck? Or should it mutate the deck and return just the topmost card or sth. like this?
-// I'd like to do without mutation but that seems kinda hard with Games where basically the whole
-// thing revolves around one shared mutable state.
-// Still, containing the muatation in one function would be better than having it spread out all over the place.
-// fn play_turn(up: &mut Player, top_card: Card, ccards: &mut CommunityCards) -> Card {
-//     match top_card {
-//         Card::Colored(_, ColoredCard::DrawTwo) => {
-//             println!("{} draws two cards.", up.name);
-//             println!("Cards before drawing {}", up.hand.len());
-//             up.hand.extend(ccards.draw(2));
-//             println!("Cards after drawing {}", up.hand.len());
-//             // up.play(top_card);
-//             // Check if player has won
-//         }
-//         Card::WildWishColor => {
-//             let color_wish = random_color();
-//             // up.play(top_card);
-//             // Check if player has won
-//         }
-//         Card::WildWishColorDrawFour => {
-//             let color_wish = random_color();
-//             up.hand.extend(ccards.draw(4));
-//             // up.play(top_card);
-//             // Check if player has won
-//         }
-//         Card::Colored(..) => println!("No action to take"),
-//     }
-// }
-
-fn whose_turn<'a>(
-    top_card: &Card,
-    ccards: &mut CommunityCards,
-    players: &'a mut Players,
-) -> &'a mut Player {
-    // The whole idea of this function is to only return the next player and only afterwards handle
-    // draw2, etc. However, this doesn't work b/c according to the rules, draw2 also leads to a
-    // skip. In that case the order is draw2, only then skip.
-    // panic!("This doesn't work. Draw2 should also skip but the player needs to draw first");
-    match &top_card {
-        // TODO: Return "up" from the match statement?
-        Card::Colored(_, ColoredCard::Skip) => {
-            let skipped = players.next_player();
-            let up = players.next_player();
-            println!("Skipping player {}", skipped.name);
-            up
-        }
-        Card::Colored(_, ColoredCard::DrawTwo) => {
-            let skipped = players.next_player();
-            skipped.hand.extend(ccards.draw(2));
-            let up = players.next_player();
-            println!("{} draws two cards.", skipped.name);
-            up
-        }
-        Card::WildWishColorDrawFour => {
-            let skipped = players.next_player();
-            skipped.hand.extend(ccards.draw(4));
-            let up = players.next_player();
-            println!("{} draws four cards.", skipped.name);
-            up
-        }
-        Card::Colored(_, ColoredCard::Reverse) => {
-            players.reverse();
-            let up = players.next_player();
-            println!("Reversing play direction");
-            up
-        }
-        _ => {
-            let up = players.next_player();
-            up
-        }
     }
 }
 
