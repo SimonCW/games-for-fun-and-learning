@@ -60,23 +60,29 @@ fn whose_turn<'a>(
     let up = match &top_card {
         // TODO: Return "up" from the match statement?
         Card::Colored(_, ColoredCard::Skip) => {
-            let skipped = players.next_player().name.clone();
-            println!("Skipping player {}", skipped);
+            {
+                let skipped = players.next_player();
+                println!("Skipping player {}", skipped.name);
+            }
             let up = players.next_player();
             up
         }
         Card::Colored(_, ColoredCard::DrawTwo) => {
-            let skipped = players.next_player();
-            skipped.hand.extend(ccards.draw(2));
+            {
+                let skipped = players.next_player();
+                skipped.hand.extend(ccards.draw(2));
+                println!("{} draws two cards.", skipped.name);
+            }
             let up = players.next_player();
-            println!("{} draws two cards.", skipped.name);
             up
         }
         Card::WildWishColorDrawFour => {
-            let skipped = players.next_player();
-            skipped.hand.extend(ccards.draw(4));
+            {
+                let skipped = players.next_player();
+                skipped.hand.extend(ccards.draw(4));
+                println!("{} draws four cards.", skipped.name);
+            }
             let up = players.next_player();
-            println!("{} draws four cards.", skipped.name);
             up
         }
         Card::Colored(_, ColoredCard::Reverse) => {
