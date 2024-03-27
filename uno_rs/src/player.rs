@@ -8,6 +8,12 @@ pub struct Player {
     pub hand: Vec<Card>,
 }
 
+impl Player {
+    pub fn take_cards(&mut self, cards: Vec<Card>) {
+        self.hand.extend(cards);
+    }
+}
+
 pub struct Players {
     name_cycle: PlayerNameCycle,
     map: HashMap<String, Player>,

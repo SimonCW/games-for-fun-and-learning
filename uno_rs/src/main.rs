@@ -42,7 +42,7 @@ pub fn main() {
         // Todo: Seperate Deck and Pile. Lumping together the pile and the deck is biting me here. I cannot borrow mutably
         // here because of `top_of_pile?`. However, I'd just need the deck mutably here, not the
         // pile
-        let up = whose_turn(top_card, &mut players, &mut ccards);
+        let up = whose_turn(&top_card, &mut players, &mut ccards);
 
         println!("It's {}'s turn", up.name);
         if round == 10 {
@@ -53,46 +53,45 @@ pub fn main() {
 }
 
 fn whose_turn<'a>(
-    top_card: Card,
+    top_card: &Card,
     players: &'a mut Players,
     ccards: &mut CommunityCards,
 ) -> &'a mut Player {
     let up = match &top_card {
-        // TODO: Return "up" from the match statement?
         Card::Colored(_, ColoredCard::Skip) => {
             {
-                let skipped = players.next_player();
+                let skipped = players.next();
                 println!("Skipping player {}", skipped.name);
             }
-            let up = players.next_player();
+            let up = players.next();
             up
         }
         Card::Colored(_, ColoredCard::DrawTwo) => {
             {
-                let skipped = players.next_player();
-                skipped.hand.extend(ccards.draw(2));
+                let skipped = players.next();
+                skipped.take_cards(ccards.draw(2));
                 println!("{} draws two cards.", skipped.name);
             }
-            let up = players.next_player();
+            let up = players.next();
             up
         }
         Card::WildWishColorDrawFour => {
             {
-                let skipped = players.next_player();
-                skipped.hand.extend(ccards.draw(4));
+                let skipped = players.next();
+                skipped.take_cards(ccards.draw(4));
                 println!("{} draws four cards.", skipped.name);
             }
-            let up = players.next_player();
+            let up = players.next();
             up
         }
         Card::Colored(_, ColoredCard::Reverse) => {
             players.reverse();
-            let up = players.next_player();
+            let up = players.next();
             println!("Reversing play direction");
             up
         }
         _ => {
-            let up = players.next_player();
+            let up = players.next();
             up
         }
     };
