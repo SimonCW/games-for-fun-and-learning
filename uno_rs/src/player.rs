@@ -1,6 +1,5 @@
-use std::collections::HashMap;
-
 use crate::cards::Card;
+use std::collections::HashMap;
 
 // TODO: Do I want clone?
 #[derive(Debug, Clone)]
@@ -26,7 +25,7 @@ impl Players {
     pub fn reverse(&mut self) {
         self.name_cycle.reverse();
     }
-    pub fn next_player(&mut self) -> &mut Player {
+    pub fn next(&mut self) -> &mut Player {
         // I first tried to use the iterator here but it didn't work out because it would have
         // needed unsafe code to get the mutable reference out of the iterator
         let name = self
@@ -85,21 +84,21 @@ mod tests {
     #[test]
     fn test_player_cycle_should_wrap_around() {
         let mut players = create_players();
-        assert_eq!(players.next_player().name, "Jane".to_string());
-        assert_eq!(players.next_player().name, "Walther".to_string());
-        assert_eq!(players.next_player().name, "Jojo".to_string());
-        assert_eq!(players.next_player().name, "Alex".to_string());
-        assert_eq!(players.next_player().name, "Jane".to_string());
+        assert_eq!(players.next().name, "Jane".to_string());
+        assert_eq!(players.next().name, "Walther".to_string());
+        assert_eq!(players.next().name, "Jojo".to_string());
+        assert_eq!(players.next().name, "Alex".to_string());
+        assert_eq!(players.next().name, "Jane".to_string());
     }
 
     #[test]
     fn test_player_cycle_reverse() {
         let mut players = create_players();
-        assert_eq!(players.next_player().name, "Jane".to_string());
-        assert_eq!(players.next_player().name, "Walther".to_string());
+        assert_eq!(players.next().name, "Jane".to_string());
+        assert_eq!(players.next().name, "Walther".to_string());
         players.reverse();
-        assert_eq!(players.next_player().name, "Jane".to_string());
-        assert_eq!(players.next_player().name, "Alex".to_string());
+        assert_eq!(players.next().name, "Jane".to_string());
+        assert_eq!(players.next().name, "Alex".to_string());
     }
 
     #[test]
